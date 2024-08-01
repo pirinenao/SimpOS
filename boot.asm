@@ -4,22 +4,6 @@ BITS 16
 message: db 'Hello World!', 0
 
 _start:
-    mov si, message
-    call print
-    jmp $
-
-print:
-    mov bh, 0 ; page
-.loop:
-    lodsb ; loads chars from si to al
-    cmp al, 0
-    je .done
-    call print_char
-    jmp .loop
-.done:
-    ret
-
-print_char:
     jmp short start
     nop
 
