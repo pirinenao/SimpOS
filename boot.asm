@@ -1,7 +1,8 @@
-ORG 0 ; set the origin to 0x0000, where BIOS will load the bootloader
+ORG 0x7c00
 BITS 16
 
-message: db 'Hello World!', 0
+CODE_SEG equ gdt_code - gdt_start
+DATA_SEG equ gdt_data - gdt_start
 
 _start:
     jmp short start
@@ -10,38 +11,58 @@ _start:
 times 33 db 0   ; making space for BPB https://wiki.osdev.org/FAT#BPB_(BIOS_Parameter_Block)
 
 start:
-    jmp 0x7c0:step2 ; jump to the step2 label in segment 0x7C0
+    jmp 0:step2 ; jump to the step2 label in segment 0x7C0
 
 step2:
     cli ; clear interrupts
     ; initializing segment registers
-    mov ax, 0x7c0
+    mov ax, 0x00
     mov ds, ax
     mov es, ax
-    mov ax, 0x00
     mov ss, ax
     mov sp, 0x7c00
     sti ; enable interrupts
-    mov si, message
-    call print
-    jmp $
 
-print:
-    mov bh, 0 ; page
-.loop:
-    lodsb ; loads chars from si to al
-    cmp al, 0
-    je .done
-    call print_char
-    jmp .loop
-.done:
-    ret
+.load_protected:
+    cli
+    lgdt[gdt_descriptor]
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
+    jmp CODE_SEG:load32
 
-print_char:
-    mov ah, 0eh
-    int 0x10 ; BIOS call
-    ret
+; Global description table
+gdt_start:
+gdt_null:
+    dd 0x0
+    dd 0x0
 
+; offset 0x8
+gdt_code:     ; CS should point to this
+    dw 0xffff ; Segment limit first 0-15 bits
+    dw 0      ; Base first 0-15 bits
+    db 0      ; Base 16-23 bits
+    db 0x9a   ; Access byte
+    db 11001111b ; High 4 bit flags and the low 4 bit flags
+    db 0      ; Base 24-31 bits
+
+; offset 0x10
+gdt_data:     ; DS, SS, ES, FS, GS
+    dw 0xffff ; Segment limit first 0-15 bits
+    dw 0      ; Base first 0-15 bits
+    db 0      ; Base 16-23 bits
+    db 0x92   ; Access byte
+    db 11001111b ; High 4 bit flags and the low 4 bit flags
+    db 0      ; Base 24-31 bits
+
+gdt_end: 
+
+gdt_descriptor:
+    dw gdt_end - gdt_start-1
+    dd gdt_start
+
+[BITS 32]
+load32:
     jmp $
 
 times 510-($-$$) db 0 ; fill the rest with 0's
