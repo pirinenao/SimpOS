@@ -75,6 +75,12 @@ load32:
     mov ss, ax
     mov ebp, 0x00200000
     mov esp, ebp
+
+    ; enabling A20 line for full memory access
+    ; https://wiki.osdev.org/A20_Line
+    in al, 0x92
+    or al, 2
+    out 0x92, al
     jmp $
 
 times 510-($-$$) db 0 ; fill the rest with 0's
