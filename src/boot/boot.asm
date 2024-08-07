@@ -33,7 +33,7 @@ step2:
     mov cr0, eax
     jmp CODE_SEG:load32  ; far jump ( jmp to other segment)
 
-; Global description table 
+; global description table 
 ; https://wiki.osdev.org/Global_Descriptor_Table
 ; https://www.youtube.com/watch?v=Wh5nPn2U_1w
 gdt_start:
@@ -79,38 +79,38 @@ ata_lba_read:
 
     ; send the highest 8 bits of the lba to hard disk controller
     shr eax, 24             ; shift bits
-    or eax, 0xE0            ; select the master drive
-    mov dx, 0x1F6           ; define port
-    out dx, al              ; send data to port
+    or eax, 0xE0            ; set the master drive bits
+    mov dx, 0x1F6           ; port 0x1F6: head register
+    out dx, al              ; send data to the port
     
-    ; send the amount of total sectors to read
+    ; send the number of total sectors to read
     mov eax, ecx
-    mov dx, 0x1F2           ; define port
-    out dx, al              ; send data to port
+    mov dx, 0x1F2           ; port 0x1F2: sector count register
+    out dx, al              ; send data to the port
 
     ; send the starting sector
     mov eax, ebx
-    mov dx, 0x1F3           ; define port
-    out dx, al              ; send data to port
+    mov dx, 0x1F3           ; port 0x1F3: sector number register
+    out dx, al              ; send data to the port
         
-    ; send bits
+    ; send 8 lba bits
     mov eax, ebx
-    mov dx, 0x1F4           ; define port
+    mov dx, 0x1F4           ; port 0x1F4: LBA mid register
     shr eax, 8              ; shift bits
-    out dx, al              ; send data to port
+    out dx, al              ; send data to the port
 
-    ; send upper 16 bits
+    ; send upper 16 bits of the lba
     mov eax, ebx 
-    mov dx, 0x1F5           ; define port
+    mov dx, 0x1F5           ; port 0x1F5: LBA high register
     shr eax, 16             ; shift bits
-    out dx, al              ; send data to port
+    out dx, al              ; send data to the port
 
-    mov dx, 0x1F7
-    mov al, 0x20
-    out dx, al
+    ; send the READ SECTORS command
+    mov dx, 0x1F7           ; port 0x1F7: command register
+    mov al, 0x20            ; READ SECTORS command
+    out dx, al              ; send data to the port
 
     ; loop for reading the sectors into the memory
-    
 .next_sector:
     push ecx                ; save the loop counter (number of sectors) into to stack
 
@@ -125,11 +125,10 @@ ata_lba_read:
     mov ecx, 256            ; define how many times insw repeats
     mov dx, 0x1F0
     rep insw                ; input word from port specified in dx into memory specified in di
-
     pop ecx
     loop .next_sector       ; decrement ecx and jump to .next_sector if ecx is not zero
 
-    ret
+    ret                     ; return when done
 
 times 510-($-$$) db 0       ; fill the rest with 0's
 dw 0xAA55                   ; boot signature
