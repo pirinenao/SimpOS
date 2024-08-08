@@ -25,6 +25,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
 	i686-elf-gcc -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
 
-# removes the binary files when called
+# removes the binary and object files when called
 clean:
 	rm -rf ./bin/*.bin
+	rm -rf ./build/*.o
