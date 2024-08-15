@@ -27,14 +27,22 @@ size_t strlen(const char *str)
 /* prints a char to the specified x, y coordinates on the screen */
 void terminal_putchar(int x, int y, char c, char color)
 {
-    video_mem[(y * VGA_HEIGHT + x)] = terminal_make_char(c, color);
+    video_mem[(y * VGA_WIDTH + x)] = terminal_make_char(c, color);
 }
 
 /* prints a char to the screen while advancing the cursor position */
 void terminal_writechar(char c, char color)
 {
+    if (c == '\n')
+    {
+        terminal_column = 0;
+        terminal_row++;
+        return;
+    }
+
     terminal_putchar(terminal_column, terminal_row, c, color);
-    terminal_column += 1;
+    terminal_column++;
+
     if (terminal_column >= VGA_WIDTH)
     {
         terminal_column = 0;
@@ -71,5 +79,5 @@ void terminal_initialize()
 void kernel_main()
 {
     terminal_initialize();
-    print("Hello World!");
+    print("Testing the new\nline character");
 }
