@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include <stdint.h>
 #include <stddef.h>
+#include "idt/idt.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -12,7 +13,7 @@ uint16_t terminal_make_char(char c, char color)
     return (color << 8) | c;
 }
 
-/* counts string size */
+/* counts string length */
 size_t strlen(const char *str)
 {
     size_t length = 0;
@@ -30,7 +31,7 @@ void terminal_putchar(int x, int y, char c, char color)
     video_mem[(y * VGA_WIDTH + x)] = terminal_make_char(c, color);
 }
 
-/* prints a char to the screen while advancing the cursor position */
+/* prints a character to the screen while advancing the cursor position */
 void terminal_writechar(char c, char color)
 {
     if (c == '\n')
@@ -67,6 +68,7 @@ void terminal_initialize()
     video_mem = (uint16_t *)(0xB8000);
     terminal_row = 0;
     terminal_column = 0;
+
     for (int y = 0; y < VGA_HEIGHT; y++)
     {
         for (int x = 0; x < VGA_WIDTH; x++)
@@ -79,5 +81,7 @@ void terminal_initialize()
 void kernel_main()
 {
     terminal_initialize();
-    print("Testing the new\nline character");
+    print("Hello World");
+
+    idt_init(); // initialize interrupt description table
 }
