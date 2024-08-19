@@ -2,11 +2,25 @@
 #include "config.h"
 #include "kernel.h"
 #include "memory/memory.h"
+#include "../io/io.h"
 
 struct idt_desc idt_descriptors[SIMPOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 
 extern void idt_load(struct idtr_desc *ptr);
+extern void int21h(void);
+extern void no_interrupt(void);
+
+void int21h_handler()
+{
+    print("keyboard pressed\n");
+    outb(0x20, 0x20); // acknowledge the interrupt
+}
+
+void no_interrupt_handler()
+{
+    outb(0x20, 0x20); // acknowledge the interrupt
+}
 
 /* test function for interrupt zero */
 void idt_zero(void)
@@ -31,7 +45,15 @@ void idt_init()
     memset(idt_descriptors, 0, sizeof(idt_descriptors)); // sets all the IDT entries to zero
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1; // sets the IDT limit
     idtr_descriptor.base = (uint32_t)idt_descriptors;    // sets the base address
-    idt_load(&idtr_descriptor);                          // loads the interrupt description table (by using external assembly function defined in idt.asm)
+
+    // initialize every entry in the IDT with default handler
+    for (int i = 0; i < SIMPOS_TOTAL_INTERRUPTS; i++)
+    {
+        idt_set(i, no_interrupt);
+    }
 
     idt_set(0, idt_zero); // create test interrupt
+    idt_set(0x21, int21h);
+
+    idt_load(&idtr_descriptor); // loads the interrupt description table (by using external assembly function defined in idt.asm)
 }

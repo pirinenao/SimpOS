@@ -20,6 +20,15 @@ _start:
     or al, 2
     out 0x92, al
 
+    ; remap master PIC (programmable interupt controller)
+    mov al, 00010001b   ; init mode
+    out 0x20, al        ; send to command port
+    mov al, 0x20        ; master ISR starting address
+    out 0x21, al        ; send to data port
+    mov al, 00000001b   ; x86 mode
+    out 0x21, al        ; send to data port
+    sti                 ; enable interrupts
+
     call kernel_main
 
     jmp $

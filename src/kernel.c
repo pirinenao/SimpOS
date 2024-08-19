@@ -82,9 +82,7 @@ void terminal_initialize()
 void kernel_main()
 {
     terminal_initialize();
-    print("Hello World");
+    print("Hello World\n");
 
     idt_init(); // initialize interrupt description table
-
-    outb(0x60, 0xff); // testing outb function
 }
