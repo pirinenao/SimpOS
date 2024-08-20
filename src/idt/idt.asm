@@ -1,8 +1,10 @@
 section .asm
 
+; external C functions
 extern int21h_handler
 extern no_interrupt_handler
 
+; make assembly functions global
 global int21h
 global idt_load
 global no_interrupt

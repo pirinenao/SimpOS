@@ -7,6 +7,7 @@
 struct idt_desc idt_descriptors[SIMPOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 
+/* external assembly functions */
 extern void idt_load(struct idtr_desc *ptr);
 extern void int21h(void);
 extern void no_interrupt(void);
@@ -46,8 +47,7 @@ void idt_init()
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1; // sets the IDT limit
     idtr_descriptor.base = (uint32_t)idt_descriptors;    // sets the base address
 
-    // initialize every entry in the IDT with default handler
-    for (int i = 0; i < SIMPOS_TOTAL_INTERRUPTS; i++)
+    for (int i = 0; i < SIMPOS_TOTAL_INTERRUPTS; i++) // initialize every entry in the IDT with default handler
     {
         idt_set(i, no_interrupt);
     }
@@ -55,5 +55,5 @@ void idt_init()
     idt_set(0, idt_zero); // create test interrupt
     idt_set(0x21, int21h);
 
-    idt_load(&idtr_descriptor); // loads the interrupt description table (by using external assembly function defined in idt.asm)
+    idt_load(&idtr_descriptor); // loads the interrupt description table
 }
