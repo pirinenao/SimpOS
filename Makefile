@@ -50,3 +50,8 @@ all: ./bin/boot.bin ./bin/kernel.bin
 clean:
 	rm -rf ./bin/*.bin
 	rm -rf ./build/*.o
+	rm -rf ./build/idt/*.o
+	rm -rf ./build/io/*.o
+	rm -rf ./build/memory/*.o
+
+
