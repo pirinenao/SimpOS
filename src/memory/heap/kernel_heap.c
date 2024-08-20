@@ -20,3 +20,8 @@ void kernel_heap_init()
         print("Failed to create heap\n");
     }
 }
+
+void *kernel_malloc(size_t size)
+{
+    return heap_malloc(&kernel_heap, size);
+}

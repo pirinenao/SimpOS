@@ -27,7 +27,7 @@ _start:
     out 0x21, al        ; send to data port
     mov al, 00000001b   ; x86 mode
     out 0x21, al        ; send to data port
-    sti                 ; enable interrupts
+
 
     call kernel_main
 

@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "idt/idt.h"
 #include "io/io.h"
+#include "memory/heap/kernel_heap.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -84,5 +85,13 @@ void kernel_main()
     terminal_initialize();
     print("Hello World\n");
 
-    idt_init(); // initialize interrupt description table
+    /*initialize heap*/
+    kernel_heap_init();
+
+    /*initialize interrupt description table*/
+    idt_init();
+
+    /* test calls for the kernel_malloc */
+    void *ptr = kernel_malloc(50);
+    void *ptr2 = kernel_malloc(5000);
 }
