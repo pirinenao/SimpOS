@@ -3,9 +3,11 @@
 #include "config.h"
 #include "../../kernel.h"
 
+/* defined structures */
 struct heap kernel_heap;
 struct heap_table kernel_heap_table;
 
+/* initialize the heap and heap table */
 void kernel_heap_init()
 {
     int total_table_entries = SIMPOS_HEAP_SIZE_BYTES / SIMPOS_HEAP_BLOCK_SIZE;
@@ -21,7 +23,14 @@ void kernel_heap_init()
     }
 }
 
+/* allocate memory */
 void *kernel_malloc(size_t size)
 {
     return heap_malloc(&kernel_heap, size);
+}
+
+/* free allocated memory */
+void kernel_free(void *ptr)
+{
+    heap_free(&kernel_heap, ptr);
 }

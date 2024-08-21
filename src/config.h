@@ -1,12 +1,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define KERNEL_CODE_SELECTOR 0x08
-#define KERNEL_DATA_SELECTOR 0x10
-#define SIMPOS_TOTAL_INTERRUPTS 512
-#define SIMPOS_HEAP_SIZE_BYTES 104857600 // 100 MB
-#define SIMPOS_HEAP_BLOCK_SIZE 4096      // 4kB
-#define SIMPOS_HEAP_ADDRESS 0x01000000
-#define SIMPOS_HEAP_TABLE_ADDRESS 0x00007E00
+/* system constants */
+#define KERNEL_CODE_SELECTOR 0x08            // selector for kernel code segment
+#define KERNEL_DATA_SELECTOR 0x10            // selector for kernel data segment
+#define SIMPOS_TOTAL_INTERRUPTS 512          // total number of interrupts supported
+#define SIMPOS_HEAP_SIZE_BYTES 104857600     // size of the heap in bytes (100 MB)
+#define SIMPOS_HEAP_BLOCK_SIZE 4096          // size of each heap block in bytes (4 KB)
+#define SIMPOS_HEAP_ADDRESS 0x01000000       // starting address of the heap
+#define SIMPOS_HEAP_TABLE_ADDRESS 0x00007E00 // address of the heap table
 
 #endif

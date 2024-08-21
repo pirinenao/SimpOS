@@ -1,6 +1,7 @@
 ORG 0x7c00
 BITS 16
 
+; constants for segment offsets
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
@@ -130,5 +131,5 @@ ata_lba_read:
 
     ret                     ; return when done
 
-times 510-($-$$) db 0       ; fill the rest with 0's
+times 510-($-$$) db 0       ; fill the rest of the sector with 0's
 dw 0xAA55                   ; boot signature

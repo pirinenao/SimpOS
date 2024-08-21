@@ -4,17 +4,17 @@ section .asm
 extern int21h_handler
 extern no_interrupt_handler
 
-; make assembly functions global
+; global functions
 global int21h
 global idt_load
 global no_interrupt
 
 idt_load:
-    push ebp                ; save the old base pointer
-    mov ebp, esp            ; set up the new base pointer
+    push ebp                ; preserve callers stack frame
+    mov ebp, esp            ; establish a new stack frame
     mov ebx, [ebp+8]        ; access the first argument
-    lidt [ebx]              ; load instruction descriptor table
-    pop ebp                 ; restore the old base pointer
+    lidt [ebx]              ; load IDT (interrupt descriptor table) to CPU's IDTR (interrupt descriptor table register)
+    pop ebp                 ; restore previous stack frame
     ret
 
 int21h:

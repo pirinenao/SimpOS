@@ -1,10 +1,17 @@
 [BITS 32]
+
+; global functions
 global _start
+
+; external C functions
 extern kernel_main
+
+; constants for segment offsets
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
 
 _start:
+    ;sets up the data segment registers and the stack pointer
     mov ax, DATA_SEG
     mov ds, ax
     mov es, ax
@@ -28,9 +35,8 @@ _start:
     mov al, 00000001b   ; x86 mode
     out 0x21, al        ; send to data port
 
+    call kernel_main    ; call the kernel_main C function
 
-    call kernel_main
+    jmp $               ; infinite jump     
 
-    jmp $
-
-times 512-($-$$) db 0           ; align to 16 bytes to avoid alignment issues with C objects
+times 512-($-$$) db 0   ; fill the rest of the sector with 0's

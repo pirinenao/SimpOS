@@ -2,6 +2,7 @@
     "files.associations": {
         "stdint.h": "c",
         "memory.h": "c",
-        "kernel_heap.h": "c"
+        "kernel_heap.h": "c",
+        "kernel.h": "c"
     }
 }
