@@ -2,6 +2,7 @@
 #include "heap.h"
 #include "config.h"
 #include "../../kernel.h"
+#include "../memory.h"
 
 /* defined structures */
 struct heap kernel_heap;
@@ -27,6 +28,18 @@ void kernel_heap_init()
 void *kernel_malloc(size_t size)
 {
     return heap_malloc(&kernel_heap, size);
+}
+
+/* allocate memory and null it */
+void *kernel_zalloc(size_t size)
+{
+    void *ptr = kernel_malloc(size);
+    if (!ptr)
+    {
+        return 0;
+    }
+    memset(ptr, 0x00, size);
+    return ptr;
 }
 
 /* free allocated memory */
