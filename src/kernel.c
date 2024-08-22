@@ -92,4 +92,7 @@ void kernel_main()
 
     /*initialize interrupt description table*/
     idt_init();
+
+    /* enable interrupts */
+    enable_interrupts();
 }
