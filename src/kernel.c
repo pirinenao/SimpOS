@@ -105,6 +105,21 @@ void kernel_main()
     /* enable paging */
     enable_paging();
 
+    /*
+     *   testing the paging functionality
+     */
+
+    /* allocates a block of memory */
+    char *ptr1 = kernel_zalloc(4096);
+    /* set virtual address 0x1000 to point to that block */
+    paging_set(paging_4gb_chunk_get_directory(kernel_chunk), (void *)0x1000, (uint32_t)ptr1 | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE | PAGING_IS_PRESENT);
+
+    /* pointer to the new virtual address 0x1000, and adding a character to that address */
+    char *ptr2 = (char *)0x1000;
+    *ptr2 = 'A';
+    /* prints ptr1, which prints out the character we just set to the virtual address 0x1000 */
+    print(ptr1);
+
     /* enable interrupts */
     enable_interrupts();
 }
