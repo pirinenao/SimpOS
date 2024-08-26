@@ -73,7 +73,7 @@ load32:
     call ata_lba_read
     jmp CODE_SEG:0x0100000
 
-; reading sectors from hard disk using ATA interface
+; reading sectors from the primary hard disk using ATA interface
 ; https://wiki.osdev.org/ATA_read/write_sectors
 ata_lba_read:
     mov ebx, eax            ; backup the lba
