@@ -9,5 +9,6 @@
 #define SIMPOS_HEAP_BLOCK_SIZE 4096          // size of each heap block in bytes (4 KB)
 #define SIMPOS_HEAP_ADDRESS 0x01000000       // starting address of the heap
 #define SIMPOS_HEAP_TABLE_ADDRESS 0x00007E00 // address of the heap table
+#define SIMPOS_SECTOR_SIZE 512               // hard disk sector size
 
 #endif

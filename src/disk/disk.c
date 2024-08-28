@@ -1,4 +1,10 @@
 #include "../io/io.h"
+#include "disk.h"
+#include "../memory/memory.h"
+#include "../config.h"
+#include "../status.h"
+
+struct disk disk;
 
 /* reading sectors from the primary hard disk using ATA interface
    https://wiki.osdev.org/ATA_PIO_Mode    */
@@ -45,4 +51,38 @@ int disk_read_sector(int lba, int total, void *buf)
     }
 
     return 0;
+}
+
+/* initializes the disk */
+void disk_init()
+{
+    memset(&disk, 0, sizeof(disk));
+    disk.type = SIMPOS_DISK_TYPE_REAL;
+    disk.sector_size = SIMPOS_SECTOR_SIZE;
+}
+
+/* returns a disk.
+ *
+ * note: at this point of the system development
+ * we're only able to work with the primary disk,
+ * so the function is designed only to work for disk 0
+ */
+struct disk *disk_get(int index)
+{
+    if (index != 0)
+    {
+        return 0;
+    }
+    return &disk;
+}
+
+/* reads disk blocks by calling the lower level disk_read_sector() function */
+int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf)
+{
+    if (idisk != &disk)
+    {
+        return -EIO;
+    }
+
+    return disk_read_sector(lba, total, buf);
 }

@@ -94,6 +94,9 @@ void kernel_main()
     /*initialize heap*/
     kernel_heap_init();
 
+    /* initialize the disks */
+    disk_init();
+
     /*initialize interrupt description table*/
     idt_init();
 
