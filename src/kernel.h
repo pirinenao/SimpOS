@@ -7,6 +7,8 @@
 /* color constants */
 #define COLOR_WHITE 15
 #define COLOR_BLACK 0
+/* path constants */
+#define SIMPOS_MAX_PATH 108
 
 /* function prototypes */
 void kernel_main();

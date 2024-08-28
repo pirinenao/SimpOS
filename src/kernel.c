@@ -6,6 +6,8 @@
 #include "memory/heap/kernel_heap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
+#include "fs/pparser.h"
+#include "string/string.h"
 
 /* variables for terminal initialization */
 uint16_t *video_mem = 0;
@@ -16,17 +18,6 @@ uint16_t terminal_column = 0;
 uint16_t terminal_make_char(char c, char color)
 {
     return (color << 8) | c;
-}
-
-/* counts string length */
-size_t strlen(const char *str)
-{
-    size_t length = 0;
-    while (str[length] != '\0')
-    {
-        length++;
-    }
-    return length;
 }
 
 /* prints a character to the specified x, y coordinates on the screen */
