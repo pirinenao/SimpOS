@@ -10,5 +10,6 @@
 #define SIMPOS_HEAP_ADDRESS 0x01000000       // starting address of the heap
 #define SIMPOS_HEAP_TABLE_ADDRESS 0x00007E00 // address of the heap table
 #define SIMPOS_SECTOR_SIZE 512               // hard disk sector size
+#define SIMPOS_MAX_PATH 108                  // max path length
 
 #endif
