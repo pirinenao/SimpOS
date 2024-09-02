@@ -78,6 +78,8 @@ clean:
 	rm -rf ./build/memory/heap/*.o
 	rm -rf ./build/memory/paging/*.o
 	rm -rf ./build/disk/*.o
+	rm -rf ./build/terminal/*.o
+
 
 
 

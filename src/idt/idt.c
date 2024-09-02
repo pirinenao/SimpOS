@@ -1,8 +1,8 @@
 #include "idt.h"
 #include "config.h"
-#include "kernel.h"
 #include "memory/memory.h"
 #include "../io/io.h"
+#include "../terminal/terminal.h"
 
 /* defined structures */
 struct idt_desc idt_descriptors[SIMPOS_TOTAL_INTERRUPTS];

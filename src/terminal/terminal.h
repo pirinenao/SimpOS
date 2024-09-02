@@ -10,5 +10,6 @@
 
 /* function prototypes */
 void print(const char *str);
+void terminal_initialize();
 
 #endif

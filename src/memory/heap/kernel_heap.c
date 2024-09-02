@@ -1,8 +1,8 @@
 #include "kernel_heap.h"
 #include "heap.h"
 #include "config.h"
-#include "../../kernel.h"
 #include "../memory.h"
+#include "../../terminal/terminal.h"
 
 /* defined structures */
 struct heap kernel_heap;
