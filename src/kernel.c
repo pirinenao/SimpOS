@@ -7,6 +7,7 @@
 #include "idt/idt.h"
 #include "memory/paging/paging.h"
 #include "fs/pparser.h"
+#include "disk/streamer.h"
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
