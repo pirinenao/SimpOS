@@ -5,12 +5,34 @@ BITS 16
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
-_start:
-    jmp short start     ; jump over the disk format information
-    nop
+jmp short start     ; jump over the FAT16 header data
+nop
 
-times 33 db 0           ; making space for BPB https://wiki.osdev.org/FAT#BPB_(BIOS_Parameter_Block)
+; FAT16 header
+; BPB https://wiki.osdev.org/FAT#BPB_(BIOS_Parameter_Block)
+OEMIdentifier           db 'SIMPOS  '       ; system identifier padded to 8 bytes
+BytesPerSector          dw 0x200            ; bytes per sector
+SectorsPerCluster       db 0x80             ; number of sectors in one cluster
+ReservedSectors         dw 200              ; number of reserved sectors for the kernel
+FATCopies               db 0x02             ; number of FAT copies (the other one is for the backup)
+RootDirEntries          dw 0x40             ; number of root directory entries (files or subdirectories)
+NumSectors              dw 0x00             ; total sectors in the logical volume. 0x00 means the count exceeds 2 bytes, so the actual value is defined in 0x20
+MediaType               db 0xF8             ; media type, 0xF8 for fixed disk
+SectorsPerFat           dw 0x100            ; number of sectors per FAT
+SectorsPerTrack         dw 0x20             ; number of sectors per track
+NumberOfHeads           dw 0x40             ; number of heads
+HiddenSectors           dd 0x00             ; number of hidden sectors
+SectorsBig              dd 0x773594         ; total sectors in the logical volume
 
+; extended BPB
+DriveNumber             db 0x80             ; drive number, 0x80 for hard disk
+WinNTBit                db 0x00             ; flags in windows NT
+Signature               db 0x29             ; signature
+VolumeID                dd 0xD105           ; volume identifier, used for tracking volumes between computers
+VolumeIDString          db 'SIMPOS BOOT'    ; volume label string
+SystemIDString          db 'FAT16   '       ; string representation of the FAT file system type
+
+; boot code starts
 start:
     jmp 0:step2         ; jump to the step2 label in segment 0x7C0
 

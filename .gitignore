@@ -3,3 +3,4 @@
 run.sh
 *.o
 *.bin
+dummy_file.txt
