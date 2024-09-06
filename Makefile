@@ -1,6 +1,6 @@
 # Makefile for building the OS
 
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kernel_heap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/disk/disk.o ./build/string/string.o ./build/fs/pparser.o ./build/terminal/terminal.o ./build/disk/streamer.o ./build/fs/file.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kernel_heap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/disk/disk.o ./build/string/string.o ./build/fs/pparser.o ./build/terminal/terminal.o ./build/disk/streamer.o ./build/fs/file.o ./build/fs/fat/fat16.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -82,6 +82,9 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/fs/file.o: ./src/fs/file.c
 	i686-elf-gcc $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/file.c -o ./build/fs/file.o
 
+./build/fs/fat/fat16.o: ./src/fs/fat/fat16.c
+	i686-elf-gcc $(INCLUDES) -I./src/fs/ -I./src/fs/fat $(FLAGS) -std=gnu99 -c ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
+
 # clean
 # removes all the generated files
 clean:
@@ -94,6 +97,11 @@ clean:
 	rm -rf ./build/memory/paging/*.o
 	rm -rf ./build/disk/*.o
 	rm -rf ./build/terminal/*.o
+	rm -rf ./build/fs/*.o
+	rm -rf ./build/fs/fat/*.o
+	rm -rf ./build/string/*.o
+
+
 
 
 

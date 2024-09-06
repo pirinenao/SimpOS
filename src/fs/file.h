@@ -23,7 +23,7 @@ enum
 
 struct disk;
 
-/* function pointers for file system operations */
+/* function pointers for filesystem operations */
 typedef void *(*FS_OPEN_FUNCTION)(struct disk *disk, struct path_part *path, FILE_MODE mode);
 typedef int (*FS_RESOLVE_FUNCTION)(struct disk *disk);
 

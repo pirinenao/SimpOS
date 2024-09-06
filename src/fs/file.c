@@ -4,6 +4,7 @@
 #include "../status.h"
 #include "../memory/heap/kernel_heap.h"
 #include "../terminal/terminal.h"
+#include "fat/fat16.h"
 
 /* array of filesystem pointers */
 struct filesystem *filesystems[SIMPOS_MAX_FILESYSTEMS];
@@ -45,7 +46,7 @@ void fs_insert_filesystem(struct filesystem *filesystem)
 /* loads the static file systems we have implemented locally*/
 static void fs_static_load()
 {
-    // fs_insert_filesystem(fat16_init());
+    fs_insert_filesystem(fat16_init());
 }
 
 /* initializes filesystems */
@@ -91,9 +92,7 @@ static struct file_descriptor *file_get_descriptor(int fd)
     return file_descriptors[index];
 }
 
-/* resolves a compatible filesystem for the disk,
- * by using filesystems own resolve() function
- */
+/* resolves a compatible filesystem for the disk */
 struct filesystem *fs_resolve(struct disk *disk)
 {
     struct filesystem *fs = 0;
