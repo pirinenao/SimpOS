@@ -90,7 +90,7 @@ static struct file_descriptor *file_get_descriptor(int fd)
 
     int index = fd - 1;
     return file_descriptors[index];
-}
+};
 
 /* resolves a compatible filesystem for the disk */
 struct filesystem *fs_resolve(struct disk *disk)
@@ -106,7 +106,7 @@ struct filesystem *fs_resolve(struct disk *disk)
         }
     }
     return fs;
-}
+};
 
 int fopen(const char *filename, const char *mode)
 {
