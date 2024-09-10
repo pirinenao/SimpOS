@@ -13,7 +13,9 @@ struct disk
 {
     SIMPOS_DISK_TYPE type;
     int sector_size;
+    int id;
     struct filesystem *filesystem;
+    void *fs_private;
 };
 
 /* function prototypes */

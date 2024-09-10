@@ -8,6 +8,7 @@
 #include "memory/paging/paging.h"
 #include "fs/pparser.h"
 #include "disk/streamer.h"
+#include "fs/file.h"
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
@@ -21,6 +22,9 @@ void kernel_main()
 
     /*initialize heap*/
     kernel_heap_init();
+
+    /* initialize filesystem */
+    fs_init();
 
     /* initialize the disks */
     disk_init();

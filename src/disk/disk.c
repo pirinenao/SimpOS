@@ -59,6 +59,7 @@ void disk_init()
     memset(&disk, 0, sizeof(disk));
     disk.type = SIMPOS_DISK_TYPE_REAL;
     disk.sector_size = SIMPOS_SECTOR_SIZE;
+    disk.id = 0;
     disk.filesystem = fs_resolve(&disk);
 }
 

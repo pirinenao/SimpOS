@@ -43,7 +43,7 @@ void fs_insert_filesystem(struct filesystem *filesystem)
     *fs = filesystem;
 }
 
-/* loads the static file systems we have implemented locally*/
+/* loads the static file systems we have implemented locally */
 static void fs_static_load()
 {
     fs_insert_filesystem(fat16_init());
@@ -106,7 +106,7 @@ struct filesystem *fs_resolve(struct disk *disk)
         }
     }
     return fs;
-};
+}
 
 int fopen(const char *filename, const char *mode)
 {

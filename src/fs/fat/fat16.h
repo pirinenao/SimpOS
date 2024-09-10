@@ -92,7 +92,7 @@ struct fat_directory_item
 
 struct fat_directory
 {
-    struct fat_directory *item;
+    struct fat_directory_item *item;
     int total;
     int first_sector_pos;
     int last_sector_pos;
