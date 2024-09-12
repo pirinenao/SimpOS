@@ -25,15 +25,15 @@ void kernel_heap_init()
 }
 
 /* allocate memory */
-void *kernel_malloc(size_t size)
+void *kmalloc(size_t size)
 {
     return heap_malloc(&kernel_heap, size);
 }
 
 /* allocate memory and null it */
-void *kernel_zalloc(size_t size)
+void *kzalloc(size_t size)
 {
-    void *ptr = kernel_malloc(size);
+    void *ptr = kmalloc(size);
     if (!ptr)
     {
         return 0;

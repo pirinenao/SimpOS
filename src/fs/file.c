@@ -68,7 +68,7 @@ static int new_file_descriptor(struct file_descriptor **desc_out)
         /* if empty descriptor slot found, store the new descriptor there */
         if (file_descriptors[i] == 0)
         {
-            struct file_descriptor *desc = kernel_zalloc(sizeof(struct file_descriptor));
+            struct file_descriptor *desc = kzalloc(sizeof(struct file_descriptor));
             desc->index = i + 1;
             file_descriptors[i] = desc;
             *desc_out = desc;

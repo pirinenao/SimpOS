@@ -14,13 +14,13 @@ struct paging_4gb_chunk *paging_new_4gb(uint8_t flags)
     int offset = 0;
 
     /* allocates and nulls memory for the page directory */
-    uint32_t *directory = kernel_zalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
+    uint32_t *directory = kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
 
     /* loops through the directory */
     for (int i = 0; i < PAGING_TOTAL_ENTRIES_PER_TABLE; i++)
     {
         /* allocates and nulls memory for the page table */
-        uint32_t *entry = (kernel_zalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE));
+        uint32_t *entry = (kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE));
 
         /* calculate addresses for the pages */
         for (int b = 0; b < PAGING_TOTAL_ENTRIES_PER_TABLE; b++)
@@ -33,7 +33,7 @@ struct paging_4gb_chunk *paging_new_4gb(uint8_t flags)
         directory[i] = (uint32_t)entry | flags | PAGING_IS_WRITEABLE;
     }
 
-    struct paging_4gb_chunk *chunk_4gb = kernel_zalloc(sizeof(struct paging_4gb_chunk));
+    struct paging_4gb_chunk *chunk_4gb = kzalloc(sizeof(struct paging_4gb_chunk));
     chunk_4gb->directory_entry = directory;
     return chunk_4gb;
 }

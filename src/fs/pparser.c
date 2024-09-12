@@ -34,7 +34,7 @@ static int pathparser_get_drive_number(const char **path)
 /* creates the root of the path with the given drive_number */
 static struct path_root *pathparser_create_root(int drive_number)
 {
-    struct path_root *path_r = kernel_zalloc(sizeof(struct path_root));
+    struct path_root *path_r = kzalloc(sizeof(struct path_root));
     path_r->drive_no = drive_number;
     path_r->first = 0;
     return path_r;
@@ -43,7 +43,7 @@ static struct path_root *pathparser_create_root(int drive_number)
 /* extracts parts of the path */
 static const char *pathparser_get_path_part(const char **path)
 {
-    char *result_path_part = kernel_zalloc(SIMPOS_MAX_PATH);
+    char *result_path_part = kzalloc(SIMPOS_MAX_PATH);
     int i = 0;
     while (**path != '/' && **path != 0x00)
     {
@@ -82,7 +82,7 @@ struct path_part *pathparser_parse_path_part(struct path_part *last_part, const 
     }
 
     /* create path part, and allocate memory */
-    struct path_part *part = kernel_zalloc(sizeof(struct path_part));
+    struct path_part *part = kzalloc(sizeof(struct path_part));
     part->part = path_part_str;
     part->next = 0x00;
 

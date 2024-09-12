@@ -100,7 +100,7 @@ int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_privat
     }
 
     int total_items = fat16_get_total_items_for_directory(disk, root_dir_sector_pos);
-    struct fat_directory_item *dir = kernel_zalloc(root_dir_size);
+    struct fat_directory_item *dir = kzalloc(root_dir_size);
 
     if (!dir)
     {
@@ -134,7 +134,7 @@ int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_privat
 int fat16_resolve(struct disk *disk)
 {
     int res = 0;
-    struct fat_private *fat_private = kernel_zalloc(sizeof(struct fat_private));
+    struct fat_private *fat_private = kzalloc(sizeof(struct fat_private));
     fat16_init_private(disk, fat_private);
 
     disk->fs_private = fat_private;
