@@ -118,6 +118,7 @@ struct fat_item_descriptor
     uint32_t pos;
 };
 
+/* for storing private data of the filesystem */
 struct fat_private
 {
     struct fat_h header;

@@ -8,7 +8,7 @@
 int fat16_resolve(struct disk *disk);
 void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode);
 
-/* creates the filesystem */
+/* points the "resolve" and "open" to the corresponding fat16 functions */
 struct filesystem fat16_fs =
     {
         .resolve = fat16_resolve,

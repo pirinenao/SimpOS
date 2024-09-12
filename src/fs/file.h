@@ -51,7 +51,7 @@ struct file_descriptor
 
 /* function prototypes */
 void fs_init();
-int fopen(const char *filename, const char *mode);
+int fopen(const char *filename, const char *mode_str);
 void fs_insert_filesystem(struct filesystem *filesystem);
 struct filesystem *fs_resolve(struct disk *disk);
 

@@ -1,10 +1,13 @@
 #include "file.h"
 #include "../config.h"
 #include "../memory/memory.h"
+#include "../disk/disk.h"
 #include "../status.h"
 #include "../memory/heap/kernel_heap.h"
 #include "../terminal/terminal.h"
+#include "../string/string.h"
 #include "fat/fat16.h"
+#include "../kernel.h"
 
 /* array of filesystem pointers */
 struct filesystem *filesystems[SIMPOS_MAX_FILESYSTEMS];
@@ -108,7 +111,92 @@ struct filesystem *fs_resolve(struct disk *disk)
     return fs;
 }
 
-int fopen(const char *filename, const char *mode)
+/* return a corresponding file mode */
+FILE_MODE file_get_mode_by_string(const char *str)
 {
-    return -EIO;
+    FILE_MODE mode = FILE_MODE_INVALID;
+    if (strncmp(str, "r", 1) == 0)
+    {
+        mode = FILE_MODE_READ;
+    }
+    else if (strncmp(str, "w", 1) == 0)
+    {
+        mode = FILE_MODE_WRITE;
+    }
+    else if (strncmp(str, "a", 1) == 0)
+    {
+        mode = FILE_MODE_APPEND;
+    }
+
+    return mode;
+}
+
+/* setups a file descriptor and returns its index */
+int fopen(const char *filename, const char *mode_str)
+{
+    int res = 0;
+
+    struct path_root *root_path = pathparser_parse(filename, NULL);
+    if (!root_path)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+
+    if (!root_path->first)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+
+    // ensure the disk we are reading from exists
+    struct disk *disk = disk_get(root_path->drive_no);
+    if (!disk)
+    {
+        res = -EIO;
+        goto out;
+    }
+
+    if (!disk->filesystem)
+    {
+        res = -EIO;
+        goto out;
+    }
+
+    FILE_MODE mode = file_get_mode_by_string(mode_str);
+    if (mode == FILE_MODE_INVALID)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+
+    /* calls open() function on the filesystem associated with the disk
+     * and gets private data of the file in return
+     */
+    void *descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
+    if (ISERR(descriptor_private_data))
+    {
+        res = ERROR_I(descriptor_private_data);
+        goto out;
+    }
+
+    struct file_descriptor *desc = 0;
+    res = new_file_descriptor(&desc);
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    /* set data to the new file descriptor */
+    desc->filesystem = disk->filesystem;
+    desc->private = descriptor_private_data;
+    desc->disk = disk;
+    res = desc->index;
+
+out:
+    // fopen shouldnt return negative values
+    if (res < 0)
+        res = 0;
+
+    return res;
 }
