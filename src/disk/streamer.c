@@ -66,5 +66,5 @@ int diskstreamer_read(struct disk_stream *stream, void *out, int total)
 /* free the memory allocated for the streamer */
 void diskstreamer_close(struct disk_stream *stream)
 {
-    kernel_free(stream);
+    kfree(stream);
 }

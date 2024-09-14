@@ -43,7 +43,7 @@ void *kzalloc(size_t size)
 }
 
 /* free allocated memory */
-void kernel_free(void *ptr)
+void kfree(void *ptr)
 {
     heap_free(&kernel_heap, ptr);
 }

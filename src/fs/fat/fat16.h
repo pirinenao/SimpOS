@@ -7,13 +7,13 @@
 
 /* definitions for systems own internal structures */
 typedef unsigned int FAT_ITEM_TYPE;
-#define FAT_ITEM_TYPE_DIRECTORY 0;
+#define FAT_ITEM_TYPE_DIRECTORY 0
 #define FAT_ITEM_TYPE_FILE 1
 
 /* FAT16 constants */
 #define SIMPOS_FAT16_SIGNATURE 0x29
-#define SIMPOS_FAT16_FAT_ENTRY_SIZE 0x2
-#define SIMPOS_FATT16_BAD_SECTOR 0xFF7
+#define SIMPOS_FAT16_FAT_ENTRY_SIZE 0x02
+#define SIMPOS_FAT16_BAD_SECTOR 0xFF7
 #define SIMPOS_FAT16_UNUSED 0x00
 
 /* FAT16 directory item attribute bitmasks*/
@@ -112,7 +112,7 @@ struct fat_item
     FAT_ITEM_TYPE type;
 };
 
-struct fat_item_descriptor
+struct fat_file_descriptor
 {
     struct fat_item *item;
     uint32_t pos;

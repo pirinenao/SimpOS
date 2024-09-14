@@ -63,7 +63,7 @@ static const char *pathparser_get_path_part(const char **path)
     /* free the allocated memory */
     if (i == 0)
     {
-        kernel_free(result_path_part);
+        kfree(result_path_part);
         result_path_part = 0;
     }
 
@@ -106,14 +106,14 @@ void pathparser_free(struct path_root *root)
         /* saves the address of the next part */
         struct path_part *next_part = part->next;
         /* frees current part */
-        kernel_free((void *)part->part);
-        kernel_free(part);
+        kfree((void *)part->part);
+        kfree(part);
         /* assigns next_part as a new target for the next loop  */
         part = next_part;
     }
 
     /* frees the path root */
-    kernel_free(root);
+    kfree(root);
 }
 
 /*  */
