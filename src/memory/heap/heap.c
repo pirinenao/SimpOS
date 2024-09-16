@@ -7,17 +7,15 @@
 /* validate the table size */
 static int heap_validate_table(void *ptr, void *end, struct heap_table *table)
 {
-    int res = 0;
     size_t table_size = (size_t)(end - ptr);
     size_t total_blocks = table_size / SIMPOS_HEAP_BLOCK_SIZE;
 
     /* if the table sizes doesn't match */
     if (table->total != total_blocks)
     {
-        res = -EINVARG;
-        return res;
+        return -EINVARG;
     }
-    return res;
+    return 0;
 }
 
 /* validate the heap address alignment */
@@ -34,8 +32,7 @@ int heap_create(struct heap *heap, void *ptr, void *end, struct heap_table *tabl
     /* if start or end addresses are not aligned */
     if (!heap_validate_alignment(ptr) || !heap_validate_alignment(end))
     {
-        res = -EINVARG;
-        return res;
+        return -EINVARG;
     }
 
     /* initialize heap */

@@ -203,22 +203,19 @@ out:
 
 int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
 {
-    int res = 0;
     if (size == 0 || nmemb == 0 || fd < 1)
     {
-        res = -EINVARG;
-        return res;
+        return -EINVARG;
     }
 
     struct file_descriptor *desc = file_get_descriptor(fd);
     if (!desc)
     {
-        res = -EINVARG;
-        return res;
+        return -EINVARG;
     }
 
     /* calls lower filesystems open function */
-    res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char *)ptr);
+    int res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char *)ptr);
 
     return res;
 }

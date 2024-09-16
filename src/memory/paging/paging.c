@@ -60,11 +60,9 @@ bool validate_paging_alignment(void *address)
 /* calculates which directory and table entries are responsible for the virtual address */
 int paging_get_indexes(void *virtual_address, uint32_t *directory_index_out, uint32_t *table_index_out)
 {
-    int res = 0;
     if (!validate_paging_alignment(virtual_address))
     {
-        res = -EINVARG;
-        return res;
+        return -EINVARG;
     }
 
     /* calculate the directory index */
@@ -72,13 +70,12 @@ int paging_get_indexes(void *virtual_address, uint32_t *directory_index_out, uin
     /* calculate the page table index */
     *table_index_out = ((uint32_t)virtual_address % (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE) / PAGING_PAGE_SIZE);
 
-    return res;
+    return 0;
 }
 
 /* makes virtual address to point a physical address */
 int paging_set(uint32_t *directory, void *virtual_address, uint32_t physical_address)
 {
-    int res = 0;
     if (!validate_paging_alignment(virtual_address))
     {
         return -EINVARG;
@@ -87,7 +84,7 @@ int paging_set(uint32_t *directory, void *virtual_address, uint32_t physical_add
     uint32_t directory_index = 0;
     uint32_t table_index = 0;
 
-    res = paging_get_indexes(virtual_address, &directory_index, &table_index);
+    int res = paging_get_indexes(virtual_address, &directory_index, &table_index);
     if (res < 0)
     {
         return res;

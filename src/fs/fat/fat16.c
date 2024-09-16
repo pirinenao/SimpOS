@@ -55,16 +55,14 @@ int fat16_get_total_items_for_directory(struct disk *disk, uint32_t directory_st
     /* repositions the stream to the start */
     if (diskstreamer_seek(stream, directory_start_pos) != SIMPOS_ALL_OK)
     {
-        res = -EIO;
-        return res;
+        return -EIO;
     }
 
     while (1)
     {
         if (diskstreamer_read(stream, &item, sizeof(item)) != SIMPOS_ALL_OK)
         {
-            res = -EIO;
-            return res;
+            return -EIO;
         }
 
         if (item.filename[0] == 0x00)
@@ -87,7 +85,6 @@ int fat16_get_total_items_for_directory(struct disk *disk, uint32_t directory_st
 
 int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_private, struct fat_directory *directory)
 {
-    int res = 0;
     struct fat_header *primary_header = &fat_private->header.primary_header;
     int root_dir_sector_pos = (primary_header->fat_copies * primary_header->sectors_per_fat) + primary_header->reserved_sectors;
     int root_dir_entries = fat_private->header.primary_header.root_dir_entries;
@@ -106,22 +103,19 @@ int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_privat
 
     if (!dir)
     {
-        res = -ENOMEM;
-        return res;
+        return -ENOMEM;
     }
 
     struct disk_stream *stream = fat_private->directory_stream;
 
     if (diskstreamer_seek(stream, fat16_sector_to_absolute(disk, root_dir_sector_pos)) != SIMPOS_ALL_OK)
     {
-        res = -EIO;
-        return res;
+        return -EIO;
     }
 
     if (diskstreamer_read(stream, dir, root_dir_size) != SIMPOS_ALL_OK)
     {
-        res = -EIO;
-        return res;
+        return -EIO;
     }
 
     directory->item = dir;
@@ -129,7 +123,7 @@ int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_privat
     directory->first_sector_pos = root_dir_sector_pos;
     directory->last_sector_pos = root_dir_sector_pos + (root_dir_size / disk->sector_size);
 
-    return res;
+    return 0;
 }
 
 /* resolves if the disk is using fat16 */
@@ -146,27 +140,28 @@ int fat16_resolve(struct disk *disk)
     if (!stream)
     {
         res = -ENOMEM;
-        return res;
+        goto out;
     }
 
     if (diskstreamer_read(stream, &fat_private->header, sizeof(fat_private->header)) != SIMPOS_ALL_OK)
     {
         res = -EIO;
-        return res;
+        goto out;
     }
 
     if (fat_private->header.shared.extended_header.signature != 0x29)
     {
         res = -EFSNOTUS;
-        return res;
+        goto out;
     }
 
     if (fat16_root_directory_setup(disk, fat_private, &fat_private->root_directory) != SIMPOS_ALL_OK)
     {
         res = -EIO;
-        return res;
+        goto out;
     }
 
+out:
     if (stream)
     {
         diskstreamer_close(stream);
@@ -292,29 +287,25 @@ static int fat16_get_cluster_for_offset(struct disk *disk, int starting_cluster,
         /* if at the last entry */
         if (entry == 0xFF8 || entry == 0xFFF)
         {
-            res = -EIO;
-            return res;
+            return -EIO;
         }
 
         /* if bad sector */
         if (entry == SIMPOS_FAT16_BAD_SECTOR)
         {
-            res = -EIO;
-            return res;
+            return -EIO;
         }
 
         /* if reserved sector */
         if (entry == 0xFF0 || entry == 0xFF6)
         {
-            res = -EIO;
-            return res;
+            return -EIO;
         }
 
         /* if no cluster */
         if (entry == 0x00)
         {
-            res = -EIO;
-            return res;
+            return -EIO;
         }
 
         cluster_to_use = entry;
@@ -333,8 +324,7 @@ static int fat16_read_internal_from_stream(struct disk *disk, struct disk_stream
 
     if (cluster_to_use < 0)
     {
-        res = cluster_to_use;
-        return res;
+        return cluster_to_use;
     }
 
     int offset_from_cluster = offset % size_of_cluster_bytes;
