@@ -9,12 +9,14 @@
 /* function prototypes */
 int fat16_resolve(struct disk *disk);
 void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode);
+int fat16_read(struct disk *disk, void *descriptor, uint32_t size, uint32_t nmemb, char *out);
 
 /* points the "resolve" and "open" to the corresponding fat16 functions */
 struct filesystem fat16_fs =
     {
         .resolve = fat16_resolve,
-        .open = fat16_open};
+        .open = fat16_open,
+        .read = fat16_read};
 
 /* initialize fat16 */
 struct filesystem *fat16_init()
@@ -213,13 +215,14 @@ struct fat_directory_item *fat16_clone_directory_item(struct fat_directory_item 
     struct fat_directory_item *item_copy = 0;
     if (size < sizeof(struct fat_directory_item))
     {
-        return item_copy;
+        return 0;
     }
 
     item_copy = kzalloc(size);
-    if (item_copy)
+
+    if (!item_copy)
     {
-        return item_copy;
+        return 0;
     }
 
     memcpy(item_copy, item, size);
@@ -330,7 +333,7 @@ static int fat16_read_internal_from_stream(struct disk *disk, struct disk_stream
     int offset_from_cluster = offset % size_of_cluster_bytes;
 
     int starting_sector = fat16_cluster_to_sector(private, cluster_to_use);
-    int starting_pos = (starting_sector * disk->sector_size) * offset_from_cluster;
+    int starting_pos = (starting_sector * disk->sector_size) + offset_from_cluster;
     int total_to_read = total > size_of_cluster_bytes ? size_of_cluster_bytes : total;
 
     res = diskstreamer_seek(stream, starting_pos);
@@ -535,4 +538,29 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode)
     descriptor->pos = 0;
 
     return descriptor;
+}
+
+/* reads data from cluster to the out pointer
+ * returns the number of reads
+ */
+int fat16_read(struct disk *disk, void *descriptor, uint32_t size, uint32_t nmemb, char *out)
+{
+    int res = 0;
+    struct fat_file_descriptor *fat_desc = descriptor;
+    struct fat_directory_item *item = fat_desc->item->item;
+    int offset = fat_desc->pos;
+    for (uint32_t i = 0; i < nmemb; i++)
+    {
+        res = fat16_read_internal(disk, fat16_get_first_cluster(item), offset, size, out);
+        if (ISERR(res))
+        {
+            return res;
+        }
+        out += size;
+        offset += size;
+    }
+
+    res = nmemb;
+
+    return res;
 }
