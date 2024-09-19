@@ -170,9 +170,7 @@ int fopen(const char *filename, const char *mode_str)
         goto out;
     }
 
-    /* calls open() function on the filesystem associated with the disk
-     * and gets private data of the file in return
-     */
+    /* calls the lower filesystems open function */
     void *descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
     if (ISERR(descriptor_private_data))
     {
@@ -201,6 +199,21 @@ out:
     return res;
 }
 
+/* function for changing the file position of the stream to given offset */
+int fseek(int fd, int offset, FILE_SEEK_MODE whence)
+{
+    int res = 0;
+    struct file_descriptor *desc = file_get_descriptor(fd);
+    if (!desc)
+    {
+        return -EIO;
+    }
+
+    /* calls the lower filesystems seek function */
+    res = desc->filesystem->seek(desc->private, offset, whence);
+    return res;
+}
+
 int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
 {
     if (size == 0 || nmemb == 0 || fd < 1)
@@ -214,7 +227,7 @@ int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
         return -EINVARG;
     }
 
-    /* calls lower filesystems open function */
+    /* calls lower filesystems read function */
     int res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char *)ptr);
 
     return res;
