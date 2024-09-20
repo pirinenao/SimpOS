@@ -199,7 +199,7 @@ out:
     return res;
 }
 
-/* function for changing the file position of the stream to given offset */
+/* changes the file position of the stream to the given offset */
 int fseek(int fd, int offset, FILE_SEEK_MODE whence)
 {
     int res = 0;
@@ -214,6 +214,7 @@ int fseek(int fd, int offset, FILE_SEEK_MODE whence)
     return res;
 }
 
+/* reads bytes from file to the given pointer */
 int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
 {
     if (size == 0 || nmemb == 0 || fd < 1)
@@ -229,6 +230,23 @@ int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
 
     /* calls lower filesystems read function */
     int res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char *)ptr);
+
+    return res;
+}
+
+/* gets information about a file */
+int fstat(int fd, struct file_stat *stat)
+{
+    int res = 0;
+    struct file_descriptor *desc = file_get_descriptor(fd);
+
+    if (!desc)
+    {
+        return -EIO;
+    }
+
+    /* calls lower filesystems stat function */
+    res = desc->filesystem->stat(desc->disk, desc->private, stat);
 
     return res;
 }
