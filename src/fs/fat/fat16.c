@@ -11,6 +11,7 @@ int fat16_resolve(struct disk *disk);
 void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode);
 int fat16_read(struct disk *disk, void *descriptor, uint32_t size, uint32_t nmemb, char *out);
 int fat16_seek(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode);
+int fat16_stat(struct disk *disk, void *private, struct file_stat *stat);
 
 /* points the "resolve" and "open" to the corresponding fat16 functions */
 struct filesystem fat16_fs =
@@ -18,7 +19,8 @@ struct filesystem fat16_fs =
         .resolve = fat16_resolve,
         .open = fat16_open,
         .read = fat16_read,
-        .seek = fat16_seek};
+        .seek = fat16_seek,
+        .stat = fat16_stat};
 
 /* initialize fat16 */
 struct filesystem *fat16_init()
@@ -542,6 +544,28 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode)
     return descriptor;
 }
 
+/* passes file size and flag information to the given stat pointer */
+int fat16_stat(struct disk *disk, void *private, struct file_stat *stat)
+{
+    struct fat_file_descriptor *descriptor = (struct fat_file_descriptor *)private;
+    struct fat_item *desc_item = descriptor->item;
+    if (desc_item->type != FAT_ITEM_TYPE_FILE)
+    {
+        return -EINVARG;
+    }
+
+    struct fat_directory_item *ritem = desc_item->item;
+    stat->file_size = ritem->file_size;
+    stat->flags = 0x00;
+
+    if (ritem->attribute & FAT_FILE_READ_ONLY)
+    {
+        stat->flags |= FILE_STAT_READ_ONLY;
+    }
+
+    return 0;
+}
+
 /* reads data from cluster to the out pointer
  * returns the number of reads
  */
@@ -581,7 +605,7 @@ int fat16_seek(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode)
     struct fat_directory_item *ritem = desc_item->item;
 
     /* ensures we can't seek past the file size */
-    if (offset >= ritem->filesize)
+    if (offset >= ritem->file_size)
     {
         return -EIO;
     }

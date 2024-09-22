@@ -82,7 +82,7 @@ struct fat_directory_item
     uint16_t last_mod_time;
     uint16_t last_mod_date;
     uint16_t low_16_bits_first_cluster;
-    uint32_t filesize;
+    uint32_t file_size;
 } __attribute__((packed));
 
 /*
