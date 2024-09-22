@@ -12,6 +12,15 @@
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
+/* prints the error message and goes into infinite loop to prevent damage */
+void kernel_panic(const char *error_msg)
+{
+    print(error_msg);
+    while (1)
+    {
+    }
+}
+
 void kernel_main()
 {
     /* initialize terminal */

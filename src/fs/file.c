@@ -60,6 +60,13 @@ void fs_init()
     fs_static_load();
 }
 
+/* free the memory allocated for the file descriptor */
+static void file_free_descriptor(struct file_descriptor *desc)
+{
+    file_descriptors[desc->index - 1] = 0x00;
+    kfree(desc);
+}
+
 /* creates new file descriptor */
 static int new_file_descriptor(struct file_descriptor **desc_out)
 {
@@ -247,6 +254,27 @@ int fstat(int fd, struct file_stat *stat)
 
     /* calls lower filesystems stat function */
     res = desc->filesystem->stat(desc->disk, desc->private, stat);
+
+    return res;
+}
+
+/* closes the file */
+int fclose(int fd)
+{
+    int res = 0;
+    struct file_descriptor *desc = file_get_descriptor(fd);
+    if (!desc)
+    {
+        return -EIO;
+    }
+
+    /* calls lower filesystems close function */
+    res = desc->filesystem->close(desc->private);
+    if (res == SIMPOS_ALL_OK)
+    {
+        /* frees the descriptor */
+        file_free_descriptor(desc);
+    }
 
     return res;
 }

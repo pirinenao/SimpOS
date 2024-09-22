@@ -8,5 +8,6 @@
 
 /* function prototypes */
 void kernel_main();
+void kernel_panic(const char *error_msg);
 
 #endif
