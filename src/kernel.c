@@ -9,8 +9,18 @@
 #include "fs/pparser.h"
 #include "disk/streamer.h"
 #include "fs/file.h"
+#include "gdt/gdt.h"
+#include "config.h"
+#include "memory/memory.h"
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
+struct gdt gdt_real[SIMPOS_TOTAL_GDT_SEGMENTS];
+struct gdt_structured gdt_structured[SIMPOS_TOTAL_GDT_SEGMENTS] = {
+    {.base = 0x00, .limit = 0x00, .type = 0x00},       /* NULL segment */
+    {.base = 0x00, .limit = 0xffffffff, .type = 0x9a}, /* kernel code segment */
+    {.base = 0x00, .limit = 0xffffffff, .type = 0x92}  /* kernel data segment*/
+
+};
 
 /* prints the error message and goes into infinite loop to prevent damage */
 void kernel_panic(const char *error_msg)
@@ -28,6 +38,13 @@ void kernel_main()
 
     /* print to the screen */
     print("Hello World\n");
+
+    /* initalize gdt */
+    memset(gdt_real, 0x00, sizeof(gdt_real));
+    gdt_structured_to_gdt(gdt_real, gdt_structured, SIMPOS_TOTAL_GDT_SEGMENTS);
+
+    /* loads the gdt to gdtr */
+    gdt_load(gdt_real, sizeof(gdt_real));
 
     /*initialize heap*/
     kernel_heap_init();

@@ -13,5 +13,6 @@
 #define SIMPOS_MAX_PATH 108                  // max path length
 #define SIMPOS_MAX_FILESYSTEMS 12            // max number of filesystems
 #define SIMPOS_MAX_FILE_DESCRIPTORS 512      // max number of file descriptors (open files)
+#define SIMPOS_TOTAL_GDT_SEGMENTS 3          // max number of gdt segments
 
 #endif
