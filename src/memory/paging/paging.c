@@ -87,6 +87,36 @@ int paging_get_indexes(void *virtual_address, uint32_t *directory_index_out, uin
     return 0;
 }
 
+int paging_map_to(uint32_t *directory, void *virt, void *phys, void *phys_end, int flags)
+{
+    int res = 0;
+    if ((uint32_t)virt % PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    if ((uint32_t)phys % PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    if ((uint32_t)phys_end % PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    if ((uint32_t)phys_end < (uint32_t)phys)
+    {
+        return -EINVARG;
+    }
+
+    uint32_t total_bytes = phys_end - phys;
+    int total_pages = total_bytes / PAGING_PAGE_SIZE;
+    res = paging_map_range(directory, virt, phys, total_pages, flags);
+
+    return res;
+}
+
 /* makes virtual address to point a physical address */
 int paging_set(uint32_t *directory, void *virtual_address, uint32_t physical_address)
 {
