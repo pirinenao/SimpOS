@@ -87,6 +87,37 @@ int paging_get_indexes(void *virtual_address, uint32_t *directory_index_out, uin
     return 0;
 }
 
+/* maps a page */
+int paging_map(uint32_t *directory, void *virt, void *phys, int flags)
+{
+    /* if not aligned with the page size */
+    if ((unsigned int)virt % PAGING_PAGE_SIZE) || ((unsigned int) phys % PAGING_PAGE_SIZE))
+        {
+            return -EINVARG;
+        }
+
+    return paging_set(directory, virt, (uint32_t)phys | flags);
+}
+
+/* maps given amount of pages */
+int paging_map_range(uint32_t *directory, void *virt, void *phys, int count, int flags)
+{
+    int res = 0;
+    for (int i = 0; i < count; i++)
+    {
+        res = paging_map(directory, virt, phys, flags);
+        if (res == 0)
+        {
+            break;
+        }
+
+        virt += PAGING_PAGE_SIZE;
+        phys += PAGING_PAGE_SIZE;
+    }
+
+    return res;
+}
+
 int paging_map_to(uint32_t *directory, void *virt, void *phys, void *phys_end, int flags)
 {
     int res = 0;
