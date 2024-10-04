@@ -57,6 +57,23 @@ int strnlen(const char *ptr, int max_length)
     return i;
 }
 
+/* copies given number of chars from source string to the destination string */
+char *strncpy(char *dest, const char *src, int count)
+{
+    int i = 0;
+    for (i = 0; i < count - 1; i++)
+    {
+        if (src[i] == 0x00)
+        {
+            break;
+        }
+        dest[i] = src[i];
+    }
+
+    dest[i] = 0x00;
+    return dest;
+}
+
 /* copies source string to the destination string */
 char *strcpy(char *dest, const char *src)
 {

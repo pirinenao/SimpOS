@@ -11,7 +11,7 @@ struct gdt
     uint8_t access;          /* Access byte */
     uint8_t high_flags;      /* High 4 bit flags and the low 4 bit limit */
     uint8_t base_24_31_bits; /* Base 24-31 bits */
-};
+} __attribute__((packed));
 
 /* structured version of gdt entry */
 /* gets turned into byte array before loaded to gdtr */

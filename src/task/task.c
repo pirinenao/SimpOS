@@ -1,10 +1,11 @@
 #include "task.h"
+#include "process.h"
 #include "../status.h"
 #include "../kernel.h"
 #include "../memory/memory.h"
 #include "../memory/heap/kernel_heap.h"
 
-int task_init(struct task *task);
+int task_init(struct task *task, struct process *process);
 
 /* the current task that is running */
 struct task *current_task = 0;
@@ -58,7 +59,7 @@ int task_free(struct task *task)
     return 0;
 }
 
-struct task *task_new()
+struct task *task_new(struct process *process)
 {
     int res = 0;
     struct task *task = kzalloc(sizeof(struct task));
@@ -68,7 +69,7 @@ struct task *task_new()
         goto out;
     }
 
-    res = task_init(task);
+    res = task_init(task, process);
     if (res != SIMPOS_ALL_OK)
     {
         goto out;
@@ -95,7 +96,7 @@ out:
 }
 
 /* creates new page directory and initializes the registers for the task */
-int task_init(struct task *task)
+int task_init(struct task *task, struct process *process)
 {
     memset(task, 0, sizeof(struct task));
     /* map entire 4gb read only address space to itself */
