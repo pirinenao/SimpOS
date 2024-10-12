@@ -5,7 +5,7 @@ INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
 # writes the binaries into os.bin file and allocates 16MB of memory to store file data
-all: ./bin/boot.bin ./bin/kernel.bin
+all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
@@ -102,23 +102,19 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/task/process.o: ./src/task/process.c
 	i686-elf-gcc $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c ./src/task/process.c -o ./build/task/process.o
 
+# label for building programs
+user_programs:
+	cd ./programs/blank && $(MAKE) all
+
+user_programs_clean:
+	cd ./programs/blank && $(MAKE) clean
 
 # clean
 # removes all the generated files
-clean:
+clean:	user_programs_clean
 	rm -rf ./bin/*.bin
-	rm -rf ./build/*.o
-	rm -rf ./build/idt/*.o
-	rm -rf ./build/io/*.o
-	rm -rf ./build/memory/*.o
-	rm -rf ./build/memory/heap/*.o
-	rm -rf ./build/memory/paging/*.o
-	rm -rf ./build/disk/*.o
-	rm -rf ./build/terminal/*.o
-	rm -rf ./build/fs/*.o
-	rm -rf ./build/fs/fat/*.o
-	rm -rf ./build/string/*.o
-	rm -rf ./build/task/*.o
+	rm -rf ./build/kernelfull.o
+	rm -rf ${FILES}
 
 
 
