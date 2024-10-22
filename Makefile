@@ -23,7 +23,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 # links the objects and creates kernel.bin
 ./bin/kernel.bin: $(FILES)
-	i686-elf-ld -g -relocatable $(FILES) ./programs/blank/build/blank.o -o ./build/kernelfull.o
+	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
 	i686-elf-gcc $(FLAGS) -T ./src/linker.ld -o ./bin/kernel.bin ./build/kernelfull.o
 
 # assembly objects
