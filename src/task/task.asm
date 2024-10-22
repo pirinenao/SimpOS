@@ -21,7 +21,6 @@ restore_general_purpose_registers:
     ret                 ; return
 
 task_return:
-    push ebp            ; preserve callers stack frame
     mov ebp, esp        ; establish a new stack frame
     mov ebx, [ebp+4]    ; access the struct
     push dword [ebx+44] ; push the data/stack selector
@@ -30,10 +29,9 @@ task_return:
     pop eax
     or eax, 0x200
     push eax
-
     push dword [ebx+32] ; push the code segment
     push dword [ebx+28] ; push the ip
-
+    
     ; setup segment registers
     mov ax, [ebx+44]
     mov ds, ax

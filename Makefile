@@ -10,14 +10,12 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 # mounts the OS to linux
-# copies the dummy file to the OS
-# file is later on used when implementing the file systems reading functionality
-# unmounts
+# copies the dummy file and the blank program to the OS
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	sudo cp ./dummy.txt /mnt/d
+	sudo cp ./programs/blank/blank.bin /mnt/d
 	sudo umount /mnt/d
-
 
 # creates boot.bin
 ./bin/boot.bin: ./src/boot/boot.asm
@@ -25,7 +23,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 # links the objects and creates kernel.bin
 ./bin/kernel.bin: $(FILES)
-	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
+	i686-elf-ld -g -relocatable $(FILES) ./programs/blank/build/blank.o -o ./build/kernelfull.o
 	i686-elf-gcc $(FLAGS) -T ./src/linker.ld -o ./bin/kernel.bin ./build/kernelfull.o
 
 # assembly objects
