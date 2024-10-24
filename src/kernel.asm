@@ -2,6 +2,7 @@
 
 ; global functions
 global _start
+global kernel_registers
 
 ; external C functions
 extern kernel_main
@@ -38,5 +39,15 @@ _start:
     call kernel_main    ; call the kernel_main C function
 
     jmp $               ; infinite jump     
+
+
+kernel_registers:
+    mov ax, 10
+    mov ds, ax
+    mov es, ax
+    mov gs, ax
+    mov fs, ax
+    ret
+
 
 times 512-($-$$) db 0   ; fill the rest of the sector with 0's

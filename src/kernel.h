@@ -5,6 +5,8 @@
 #define ERROR(value) (void *)(value)
 #define ERROR_I(value) (int)(value)
 #define ISERR(value) ((int)(value) < 0)
+void kernel_page();
+void kernel_registers();
 
 /* function prototypes */
 void kernel_main();

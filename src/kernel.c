@@ -30,6 +30,13 @@ struct gdt_structured gdt_structured[SIMPOS_TOTAL_GDT_SEGMENTS] = {
 
 };
 
+/* switch to the kernel page directory */
+void kernel_page()
+{
+    kernel_registers(); // switch to the kernel registers
+    paging_switch(kernel_chunk);
+}
+
 /* prints the error message and goes into infinite loop to prevent damage */
 void kernel_panic(const char *error_msg)
 {
