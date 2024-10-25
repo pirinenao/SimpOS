@@ -5,6 +5,8 @@
 #include "../memory/memory.h"
 #include "../memory/heap/kernel_heap.h"
 #include "../idt/idt.h"
+#include "../config.h"
+#include "../string/string.h"
 
 int task_init(struct task *task, struct process *process);
 
@@ -119,6 +121,39 @@ void task_save_state(struct task *task, struct interrupt_frame *frame)
     task->registers.edi = frame->edi;
     task->registers.edx = frame->edx;
     task->registers.esi = frame->esi;
+}
+
+int copy_string_from_task(struct task *task, void *virtual, void *phys, int max)
+{
+    if (max >= PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    char *tmp = kzalloc(max);
+
+    if (!tmp)
+    {
+        return -ENOMEM;
+    }
+
+    uint32_t *task_directory = task->page_directory->directory_entry;
+    uint32_t old_entry = paging_get(task_directory, tmp);
+    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    paging_switch(task->page_directory);
+    strncpy(tmp, virtual, max);
+    kernel_page();
+
+    int res = paging_set(task_directory, tmp, old_entry);
+
+    if (res < 0)
+    {
+        kfree(tmp);
+        return -EIO;
+    }
+
+    strncpy(phys, tmp, max);
+    return res;
 }
 
 void task_current_save_state(struct interrupt_frame *frame)
