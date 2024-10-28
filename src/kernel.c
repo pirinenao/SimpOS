@@ -52,9 +52,6 @@ void kernel_main()
     /* initialize terminal */
     terminal_initialize();
 
-    /* print to the screen */
-    print("Hello World\n");
-
     /* initalize gdt */
     memset(gdt_real, 0x00, sizeof(gdt_real));
     gdt_structured_to_gdt(gdt_real, gdt_structured, SIMPOS_TOTAL_GDT_SEGMENTS);

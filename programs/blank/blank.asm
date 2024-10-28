@@ -5,10 +5,12 @@ section .asm
 global _start
 
 _start:
-    push 30
-    push 20
-    mov eax, 0  ; index of the desired command 
-    int 0x80    ; call the interrupt 0x80
-    add esp, 8  ; restore stack
 
-    jmp $
+    push message    ; push message to stack
+    mov eax, 1      ; Command
+    int 0x80        ; call interrupt 0x80
+    add esp, 4      ; adjust the stack pointer
+    jmp $           ; infinite jump
+
+section .data
+message: db 'Hello from the user program!', 0
