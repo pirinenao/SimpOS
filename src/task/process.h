@@ -18,10 +18,18 @@ struct process
     void *stack;
     /* size of the data pointer by ptr */
     uint32_t size;
+    /* keyboard buffer */
+    struct keyboard_buffer
+    {
+        char buffer[SIMPOS_BUFFER_SIZE];
+        int tail;
+        int head;
+    } keyboard;
 };
 
 /* function prototypes */
 int process_load_for_slot(const char *filename, struct process **process, int process_slot);
 int process_load(const char *filename, struct process **process);
+struct process *process_current();
 
 #endif
