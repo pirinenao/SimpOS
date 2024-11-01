@@ -24,4 +24,5 @@
 #define USER_CODE_SEGMENT 0x1b                                                                                               // selector for user code segment in the GDT
 #define SIMPOS_MAX_ISR80H_COMMANDS 1024                                                                                      // maximum number of commands for ISR 0x80 (system call interrupt)
 #define SIMPOS_BUFFER_SIZE 1024                                                                                              // size of buffers used in the system
+
 #endif

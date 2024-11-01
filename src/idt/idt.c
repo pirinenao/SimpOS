@@ -5,11 +5,13 @@
 #include "../terminal/terminal.h"
 #include "../task/task.h"
 #include "../kernel.h"
+#include "../status.h"
 
 /* defined structures */
 struct idt_desc idt_descriptors[SIMPOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 
+static INTERRUPT_CALLBACK_FUNCTION interrupt_callbacks[SIMPOS_TOTAL_INTERRUPTS];
 static ISR80_COMMAND isr80h_commands[SIMPOS_MAX_ISR80H_COMMANDS];
 
 /* external assembly functions */
@@ -17,17 +19,24 @@ extern void idt_load(struct idtr_desc *ptr);
 extern void int21h();
 extern void no_interrupt();
 extern void isr80h_wrapper();
-
-/* interrupt 21h handler: handles the keyboard interrupt */
-void int21h_handler()
-{
-    print("keyboard pressed\n");
-    outb(0x20, 0x20); // acknowledge the interrupt
-}
+extern void *interrupt_pointer_table[SIMPOS_TOTAL_INTERRUPTS];
 
 /* default handler which doesn't have any functionality */
 void no_interrupt_handler()
 {
+    outb(0x20, 0x20); // acknowledge the interrupt
+}
+
+void interrupt_handler(int interrupt, struct interrupt_frame *frame)
+{
+    kernel_page();
+    if (interrupt_callbacks[interrupt] != 0)
+    {
+        task_current_save_state(frame);
+        interrupt_callbacks[interrupt](frame);
+    }
+
+    task_page();
     outb(0x20, 0x20); // acknowledge the interrupt
 }
 
@@ -52,15 +61,26 @@ void idt_init()
     /* initialize every IDT entry with default handler */
     for (int i = 0; i < SIMPOS_TOTAL_INTERRUPTS; i++)
     {
-        idt_set(i, no_interrupt);
+        idt_set(i, interrupt_pointer_table[i]);
     }
 
     /* create ISR entries */
-    idt_set(0x21, int21h);
     idt_set(0x80, isr80h_wrapper);
 
     /* loads the IDT into IDTR */
     idt_load(&idtr_descriptor);
+}
+
+int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION interrupt_callback)
+{
+    if (interrupt < 0 || interrupt >= SIMPOS_TOTAL_INTERRUPTS)
+    {
+        return -EINVARG;
+    }
+
+    interrupt_callbacks[interrupt] = interrupt_callback;
+
+    return 0;
 }
 
 void isr80h_register_command(int command_id, ISR80_COMMAND command)
