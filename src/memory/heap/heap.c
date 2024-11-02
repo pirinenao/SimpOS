@@ -48,7 +48,7 @@ int heap_create(struct heap *heap, void *ptr, void *end, struct heap_table *tabl
     }
 
     /* initialize heap table */
-    size_t table_size = sizeof(SIMPOS_HEAP_BLOCK_SIZE) * table->total;
+    size_t table_size = sizeof(HEAP_BLOCK_TABLE_ENTRY) * table->total;
     memset(table->entries, HEAP_BLOCK_TABLE_ENTRY_FREE, table_size);
     return res;
 }
@@ -140,7 +140,7 @@ void *heap_malloc_blocks(struct heap *heap, uint32_t total_blocks)
 
     if (start_block < 0)
     {
-        return (void *)start_block;
+        return address;
     }
 
     address = heap_block_to_address(heap, start_block);
