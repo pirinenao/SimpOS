@@ -22,6 +22,7 @@ struct process *process_current()
     return current_process;
 }
 
+/* returns process based on the process_id */
 struct process *process_get(int process_id)
 {
     /* ensures that the process id is in boundaries */
@@ -31,6 +32,13 @@ struct process *process_get(int process_id)
     }
 
     return processes[process_id];
+}
+
+/* switch current process to the given process */
+int process_switch(struct process *process)
+{
+    current_process = process;
+    return 0;
 }
 
 /* loads the binary file into memory */
@@ -108,6 +116,18 @@ int process_get_free_slot()
     }
 
     return -EISTKN;
+}
+
+/* loads process and switches to it */
+int process_load_switch(const char *filename, struct process **process)
+{
+    int res = process_load(filename, process);
+    if (res == 0)
+    {
+        process_switch(*process);
+    }
+
+    return res;
 }
 
 /* find a free slot for the process and loads to the process there */
