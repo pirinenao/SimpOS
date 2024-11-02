@@ -1,7 +1,6 @@
 section .asm
 
 ; external C functions
-extern int21h_handler
 extern no_interrupt_handler
 extern isr80h_handler
 extern interrupt_handler

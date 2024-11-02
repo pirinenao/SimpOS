@@ -16,7 +16,6 @@ static ISR80_COMMAND isr80h_commands[SIMPOS_MAX_ISR80H_COMMANDS];
 
 /* external assembly functions */
 extern void idt_load(struct idtr_desc *ptr);
-extern void int21h();
 extern void no_interrupt();
 extern void isr80h_wrapper();
 extern void *interrupt_pointer_table[SIMPOS_TOTAL_INTERRUPTS];
@@ -71,6 +70,7 @@ void idt_init()
     idt_load(&idtr_descriptor);
 }
 
+/* registers interrupts and their corresponding handles */
 int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION interrupt_callback)
 {
     if (interrupt < 0 || interrupt >= SIMPOS_TOTAL_INTERRUPTS)
@@ -83,6 +83,7 @@ int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION i
     return 0;
 }
 
+/* registers interrupt 0x80 command */
 void isr80h_register_command(int command_id, ISR80_COMMAND command)
 {
     if (command_id < 0 || command_id >= SIMPOS_MAX_ISR80H_COMMANDS)
@@ -109,6 +110,7 @@ void *isr80h_handle_command(int command, struct interrupt_frame *frame)
     }
 
     ISR80_COMMAND command_func = isr80h_commands[command];
+
     /* if command doesn't exist */
     if (!command_func)
     {

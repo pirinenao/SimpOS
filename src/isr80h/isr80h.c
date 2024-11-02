@@ -3,6 +3,7 @@
 #include "io.h"
 #include "misc.h"
 
+/* register all the current commands available for interrupt 0x80 */
 void isr80h_register_commands()
 {
     isr80h_register_command(SYSTEM_COMMAND0_SUM, isr80h_command0_sum);

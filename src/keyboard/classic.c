@@ -8,8 +8,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "../io/io.h"
+#include "../idt/idt.h"
+#include "../kernel.h"
+#include "../task/task.h"
 
 int classic_keyboard_init();
+void classic_keyboard_handle_interrupt();
 
 /* ascii character for corresponding scan codes */
 static uint8_t keyboard_scan_set_one[] = {
@@ -31,10 +35,11 @@ struct keyboard classic_keyboard = {
     .init = classic_keyboard_init,
 };
 
-/* enables the PS/2 port */
+/* enables the PS/2 port and registers the ISR */
 int classic_keyboard_init()
 {
-    outb(PS2_PORT, PS2_COMMAND_ENABLE_FIRST_PORT);
+    idt_register_interrupt_callback(ISR_KEYBOARD_INTERRUPT, classic_keyboard_handle_interrupt);
+    outb(PS2_COMMAND_PORT, PS2_COMMAND_ENABLE_FIRST_PORT);
     return 0;
 }
 
@@ -51,9 +56,27 @@ uint8_t classic_keyboard_scancode_to_char(uint8_t scancode)
     return c;
 }
 
+/* interrupt handle for keyboard interrupt */
 void classic_keyboard_handle_interrupt()
 {
-    return;
+    kernel_page();
+    uint8_t scancode = 0;
+    scancode = insb(PS2_DATA_PORT);
+    insb(PS2_DATA_PORT); // read byte from the data port
+
+    if (scancode & CLASSIC_KEYBOARD_KEY_RELEASE)
+    {
+        return;
+    }
+
+    uint8_t c = classic_keyboard_scancode_to_char(scancode);
+
+    if (c != 0)
+    {
+        keyboard_push(c);
+    }
+
+    task_page();
 }
 
 struct keyboard *classic_init()
