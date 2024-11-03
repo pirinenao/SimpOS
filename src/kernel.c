@@ -95,9 +95,6 @@ void kernel_main()
     /* register kernel commands */
     isr80h_register_commands();
 
-    /* enable interrupts */
-    // enable_interrupts();
-
     /* initialize keyboards */
     keyboard_init();
 

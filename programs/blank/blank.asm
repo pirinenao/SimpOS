@@ -5,13 +5,14 @@ section .asm
 global _start
 
 _start:
+
+_getkeyloop:
     call getKey
-    push message
-    mov eax, 1
+    push eax
+    mov eax, 3
     int 0x80
     add esp, 4
-
-    jmp $           ; infinite jump
+    jmp _getkeyloop   ; infinite jump
 
 getKey:
     mov eax, 2      ; command getkey
