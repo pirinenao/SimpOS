@@ -20,6 +20,24 @@ void terminal_putchar(int x, int y, char c, char color)
     video_mem[(y * VGA_WIDTH + x)] = terminal_make_char(c, color);
 }
 
+void terminal_backspace()
+{
+    if (terminal_row == 0 && terminal_column == 0)
+    {
+        return;
+    }
+
+    if (terminal_column == 0)
+    {
+        terminal_row -= 1;
+        terminal_column = VGA_WIDTH;
+    }
+
+    terminal_column -= 1;
+    terminal_writechar(' ', 15);
+    terminal_column -= 1;
+}
+
 /* prints a character to the screen while advancing the cursor position */
 void terminal_writechar(char c, char color)
 {
@@ -28,6 +46,12 @@ void terminal_writechar(char c, char color)
     {
         terminal_column = 0;
         terminal_row++;
+        return;
+    }
+
+    if (c == 0x08)
+    {
+        terminal_backspace();
         return;
     }
 
