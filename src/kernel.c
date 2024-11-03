@@ -103,12 +103,12 @@ void kernel_main()
 
     struct process *process = 0;
     int res = process_load_switch("0:/blank.bin", &process);
+
     if (res != SIMPOS_ALL_OK)
     {
         kernel_panic("Failed to load blank.bin\n");
     }
 
-    keyboard_push('X');
     task_run_first_ever_task();
 
     while (1)
