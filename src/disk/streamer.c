@@ -1,6 +1,7 @@
 #include "streamer.h"
 #include "../memory/heap/kernel_heap.h"
 #include "../config.h"
+#include <stdbool.h>
 
 /* creates a new disk streamer */
 struct disk_stream *diskstreamer_new(int disk_id)
@@ -31,7 +32,14 @@ int diskstreamer_read(struct disk_stream *stream, void *out, int total)
     /* calculates the sector and offset */
     int sector = stream->pos / SIMPOS_SECTOR_SIZE;
     int offset = stream->pos % SIMPOS_SECTOR_SIZE;
+    int total_to_read = total;
+    bool overflow = (offset + total_to_read) >= SIMPOS_SECTOR_SIZE;
     char buf[SIMPOS_SECTOR_SIZE];
+
+    if (overflow)
+    {
+        total_to_read -= (offset + total_to_read) - SIMPOS_SECTOR_SIZE;
+    }
 
     /* reads one sector to the buffer */
     int res = disk_read_block(stream->disk, sector, 1, buf);
@@ -40,9 +48,6 @@ int diskstreamer_read(struct disk_stream *stream, void *out, int total)
     {
         return res;
     }
-
-    /* if total is greater than the default sector size, set value to default sector size */
-    int total_to_read = total > SIMPOS_SECTOR_SIZE ? SIMPOS_SECTOR_SIZE : total;
 
     /* loops through the buffer, and reads to the out */
     for (int i = 0; i < total_to_read; i++)
@@ -54,7 +59,7 @@ int diskstreamer_read(struct disk_stream *stream, void *out, int total)
     stream->pos += total_to_read;
 
     /* checks if more than a sector to read */
-    if (total > SIMPOS_SECTOR_SIZE)
+    if (overflow)
     {
         /* read another sector recursively */
         res = diskstreamer_read(stream, out, total - SIMPOS_SECTOR_SIZE);
