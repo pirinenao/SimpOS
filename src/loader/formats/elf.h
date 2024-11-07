@@ -1,9 +1,9 @@
 /*
  * essential ELF constants and data structures for
- * handling and parsing ELF files in 32-bit architecture. 
+ * handling and parsing ELF files in 32-bit architecture.
  * more information in the ELF specification:
  * https://refspecs.linuxfoundation.org/elf/elf.pdf
-*/
+ */
 
 #ifndef ELF_H
 #define ELF_H
@@ -41,7 +41,7 @@
 
 #define ET_NONE 0
 #define ET_REL 1
-#define DT_EXEC 2
+#define ET_EXEC 2
 #define ET_DYN 3
 #define ET_CORE 4
 
@@ -75,7 +75,7 @@ struct elf32_phdr
     elf32_word p_memsz;
     elf32_word p_flags;
     elf32_word p_align;
-}__attribute__((packed));
+} __attribute__((packed));
 
 struct elf32_shrd
 {
@@ -89,7 +89,7 @@ struct elf32_shrd
     elf32_word sh_info;
     elf32_word sh_addralign;
     elf32_word sh_entsize;
-}__attribute__((packed));
+} __attribute__((packed));
 
 struct elf_header
 {
@@ -107,7 +107,7 @@ struct elf_header
     elf32_half e_shentsize;
     elf32_half e_shnum;
     elf32_half e_shstrndx;
-}__attribute__((packed));
+} __attribute__((packed));
 
 struct elf32_dyn
 {
@@ -117,8 +117,8 @@ struct elf32_dyn
         elf32_word d_val;
         elf32_addr d_ptr;
     } d_un;
-    
-}__attribute__((packed));
+
+} __attribute__((packed));
 
 struct elf32_sym
 {
@@ -128,6 +128,10 @@ struct elf32_sym
     unsigned char st_info;
     unsigned char st_other;
     elf32_half st_shndx;
-}__attribute__((packed));
+} __attribute__((packed));
+
+/* function prototypes */
+void *elf_get_entry_ptr(struct elf_header *elf_header);
+uint32_t elf_get_entry(struct elf_header *elf_header);
 
 #endif
