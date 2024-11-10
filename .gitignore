@@ -5,3 +5,4 @@ run.sh
 *.bin
 dummy.txt
 .git.backup
+*.elf

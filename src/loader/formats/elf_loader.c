@@ -7,6 +7,7 @@
 #include "../../memory/paging/paging.h"
 #include "../../kernel.h"
 #include "../../config.h"
+#include "../../fs/file.h"
 
 const char *elf_signature[] = {0x7f, 'E', 'L', 'F'};
 
@@ -115,4 +116,129 @@ void *elf_phys_end(struct elf_file *file)
 int elf_validate_loaded(struct elf_header *header)
 {
     return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header) && elf_has_program_header(header)) ? SIMPOS_ALL_OK : -EINVARG;
+}
+
+/* calculates base and end addresses for the program header */
+int elf_process_phdr_pt_load(struct elf_file *elf_file, struct elf32_phdr *phdr)
+{
+    /* base addresses */
+    if (elf_file->virtual_base_address >= (void *)phdr->p_vaddr || elf_file->virtual_base_address == 0x00)
+    {
+        elf_file->virtual_base_address = (void *)phdr->p_vaddr;
+        elf_file->physical_base_address = elf_memory(elf_file) + phdr->p_offset;
+    }
+
+    /* end addresses */
+    unsigned int end_virtual_address = phdr->p_vaddr + phdr->p_filesz;
+    if (elf_file->virtual_end_address <= (void *)(end_virtual_address) || elf_file->virtual_end_address == 0x00)
+    {
+        elf_file->virtual_end_address = (void *)end_virtual_address;
+        elf_file->physical_end_address = elf_memory(elf_file) + phdr->p_offset + phdr->p_filesz;
+    }
+    return 0;
+}
+
+/* processes program header */
+int elf_process_pheader(struct elf_file *elf_file, struct elf32_phdr *phdr)
+{
+    int res = 0;
+    switch (phdr->p_type)
+    {
+    case PT_LOAD:
+        res = elf_process_phdr_pt_load(elf_file, phdr);
+        break;
+    }
+}
+
+/* processes all the available program headers */
+int elf_process_pheaders(struct elf_file *elf_file)
+{
+    int res = 0;
+    struct elf_header *header = elf_header(elf_file);
+
+    /* loops through all the program headers */
+    for (int i = 0; i < header->e_phnum; i++)
+    {
+        struct elf32_phdr *phdr = elf_program_header(header, i);
+        res = elf_process_pheader(elf_file, phdr);
+        if (res < 0)
+        {
+            break;
+        }
+    }
+}
+
+/* validates the file and processes the program headers  */
+int elf_process_loaded(struct elf_file *elf_file)
+{
+    int res = 0;
+    struct elf_header *header = elf_header(elf_file);
+    int res = elf_validate_loaded(header);
+    if (res < 0)
+    {
+        return res;
+    }
+
+    res = elf_process_pheaders(elf_file);
+    if (res < 0)
+    {
+        return res;
+    }
+}
+
+/* loads and initializes the elf file */
+int elf_load(const char *filename, struct elf_file **file_out)
+{
+    struct elf_file *elf_file = kzalloc(sizeof(struct elf_file));
+    int fd = 0;
+    int res = fopen(filename, "r");
+    if (res <= 0)
+    {
+        goto out;
+    }
+    fd = res;
+
+    /* fetch file information */
+    struct file_stat stat;
+    res = fstat(fd, &stat);
+
+    if (res <= 0)
+    {
+        goto out;
+    }
+
+    /* allocate memory for the file */
+    elf_file->elf_memory = kzalloc(stat.file_size);
+    /* read the file into the allocated memory */
+    res = fread(elf_file->elf_memory, stat.file_size, 1, fd);
+
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    /* process the loaded elf file */
+    res = elf_process_loaded(elf_file);
+
+    if (res < 0)
+    {
+        goto out;
+    }
+    /* point to the memory address of our elf file */
+    *file_out = elf_file;
+out:
+    fclose(fd);
+    return res;
+}
+
+/* close the elf file by releasing the allocated memory */
+void elf_close(struct elf_file *file)
+{
+    if (!file)
+    {
+        return;
+    }
+
+    kfree(file->elf_memory);
+    kfree(file);
 }
