@@ -1,11 +1,11 @@
+#include "memory/memory.h"
+#include "terminal/terminal.h"
+#include "io/io.h"
+#include "task/task.h"
+#include "kernel.h"
+#include "status.h"
 #include "idt.h"
 #include "config.h"
-#include "memory/memory.h"
-#include "../io/io.h"
-#include "../terminal/terminal.h"
-#include "../task/task.h"
-#include "../kernel.h"
-#include "../status.h"
 
 /* defined structures */
 struct idt_desc idt_descriptors[SIMPOS_TOTAL_INTERRUPTS];

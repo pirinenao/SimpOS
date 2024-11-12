@@ -1,10 +1,10 @@
 #include "pparser.h"
-#include "../kernel.h"
-#include "../string/string.h"
-#include "../memory/heap/kernel_heap.h"
-#include "../memory/memory.h"
-#include "../status.h"
-#include "../config.h"
+#include "kernel.h"
+#include "string/string.h"
+#include "memory/heap/kernel_heap.h"
+#include "memory/memory.h"
+#include "status.h"
+#include "config.h"
 
 /* validates the given path */
 static int pathparser_path_valid_format(const char *path)

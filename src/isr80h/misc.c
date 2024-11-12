@@ -1,6 +1,6 @@
 #include "misc.h"
-#include "../idt/idt.h"
-#include "../task/task.h"
+#include "idt/idt.h"
+#include "task/task.h"
 
 /* only for test purposes */
 void *isr80h_command0_sum(struct interrupt_frame *frame)

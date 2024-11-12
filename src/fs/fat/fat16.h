@@ -1,8 +1,8 @@
 #ifndef FAT16_H
 #define FAT16_H
-#include "../../disk/disk.h"
-#include "../../disk/streamer.h"
-#include "../file.h"
+#include "disk/streamer.h"
+#include "disk/disk.h"
+#include "file.h"
 #include <stdint.h>
 
 /* definitions for systems own internal structures */

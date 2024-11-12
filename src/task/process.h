@@ -1,6 +1,6 @@
 #ifndef PROCESS_H
 #define PROCESS_H
-#include "../config.h"
+#include "config.h"
 #include "task.h"
 #include <stdint.h>
 

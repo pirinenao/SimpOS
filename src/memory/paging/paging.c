@@ -1,6 +1,6 @@
-#include "paging.h"
 #include "memory/heap/kernel_heap.h"
-#include "../../status.h"
+#include "paging.h"
+#include "status.h"
 
 /* function prototype */
 void paging_load_directory(uint32_t *directory);

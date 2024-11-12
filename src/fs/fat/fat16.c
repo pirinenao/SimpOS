@@ -1,9 +1,9 @@
-#include "../../status.h"
-#include "../../string/string.h"
-#include "../../memory/memory.h"
-#include "../../memory/heap/kernel_heap.h"
-#include "../../kernel.h"
-#include "../../config.h"
+#include "string/string.h"
+#include "memory/memory.h"
+#include "memory/heap/kernel_heap.h"
+#include "status.h"
+#include "kernel.h"
+#include "config.h"
 #include "fat16.h"
 
 /* function prototypes */

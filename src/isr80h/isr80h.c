@@ -1,5 +1,5 @@
 #include "isr80h.h"
-#include "../idt/idt.h"
+#include "idt/idt.h"
 #include "io.h"
 #include "misc.h"
 

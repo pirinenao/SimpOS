@@ -1,5 +1,5 @@
 #include "gdt.h"
-#include "../kernel.h"
+#include "kernel.h"
 
 /* converts the gdt entry into a byte array */
 void encodeGdtEntry(uint8_t *target, struct gdt_structured source)

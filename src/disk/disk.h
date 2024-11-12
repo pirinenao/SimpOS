@@ -1,6 +1,6 @@
 #ifndef DISK_H
 #define DISK_H
-#include "../fs/file.h"
+#include "fs/file.h"
 
 /* type def for disk types */
 typedef unsigned int SIMPOS_DISK_TYPE;

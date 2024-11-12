@@ -1,6 +1,6 @@
+#include "memory/heap/kernel_heap.h"
 #include "streamer.h"
-#include "../memory/heap/kernel_heap.h"
-#include "../config.h"
+#include "config.h"
 #include <stdbool.h>
 
 /* creates a new disk streamer */

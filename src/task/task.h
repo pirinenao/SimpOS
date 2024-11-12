@@ -1,7 +1,7 @@
 #ifndef TASK_H
 #define TASK_H
-#include "../config.h"
-#include "../memory/paging/paging.h"
+#include "config.h"
+#include "memory/paging/paging.h"
 
 struct interrupt_frame;
 

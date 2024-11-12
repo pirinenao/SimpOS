@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 #include "elf.h"
-#include "../../config.h"
+#include "config.h"
 
 struct elf_file
 {

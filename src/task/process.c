@@ -1,14 +1,14 @@
-#include "process.h"
-#include "../config.h"
+#include "memory/heap/kernel_heap.h"
+#include "memory/paging/paging.h"
 #include "memory/memory.h"
-#include "../status.h"
-#include "task.h"
-#include "../fs/file.h"
-#include "../string/string.h"
-#include "../memory/heap/kernel_heap.h"
-#include "../kernel.h"
-#include "../memory/paging/paging.h"
 #include "loader/formats/elf_loader.h"
+#include "fs/file.h"
+#include "string/string.h"
+#include "kernel.h"
+#include "status.h"
+#include "process.h"
+#include "config.h"
+#include "task.h"
 
 struct process *current_process = 0;
 static struct process *processes[SIMPOS_MAX_PROCESSES] = {};

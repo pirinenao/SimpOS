@@ -3,14 +3,14 @@
  * https://wiki.osdev.org/PS/2_Keyboard
  */
 
-#include "classic.h"
-#include "keyboard.h"
 #include <stdint.h>
 #include <stddef.h>
-#include "../io/io.h"
-#include "../idt/idt.h"
-#include "../kernel.h"
-#include "../task/task.h"
+#include "io/io.h"
+#include "idt/idt.h"
+#include "task/task.h"
+#include "classic.h"
+#include "keyboard.h"
+#include "kernel.h"
 
 int classic_keyboard_init();
 void classic_keyboard_handle_interrupt();

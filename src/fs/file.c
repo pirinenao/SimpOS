@@ -1,13 +1,13 @@
-#include "file.h"
-#include "../config.h"
-#include "../memory/memory.h"
-#include "../disk/disk.h"
-#include "../status.h"
-#include "../memory/heap/kernel_heap.h"
-#include "../terminal/terminal.h"
-#include "../string/string.h"
+#include "memory/heap/kernel_heap.h"
+#include "memory/memory.h"
+#include "terminal/terminal.h"
+#include "string/string.h"
 #include "fat/fat16.h"
-#include "../kernel.h"
+#include "disk/disk.h"
+#include "status.h"
+#include "file.h"
+#include "config.h"
+#include "kernel.h"
 
 /* array of filesystem pointers */
 struct filesystem *filesystems[SIMPOS_MAX_FILESYSTEMS];

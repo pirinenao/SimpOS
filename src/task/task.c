@@ -1,12 +1,11 @@
+#include "memory/heap/kernel_heap.h"
+#include "memory/memory.h"
+#include "string/string.h"
+#include "idt/idt.h"
 #include "task.h"
 #include "process.h"
-#include "../status.h"
-#include "../kernel.h"
-#include "../memory/memory.h"
-#include "../memory/heap/kernel_heap.h"
-#include "../idt/idt.h"
-#include "../config.h"
-#include "../string/string.h"
+#include "status.h"
+#include "kernel.h"
 
 int task_init(struct task *task, struct process *process);
 

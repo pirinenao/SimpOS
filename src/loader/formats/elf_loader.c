@@ -1,15 +1,15 @@
+#include "memory/memory.h"
+#include "memory/paging/paging.h"
+#include "memory/heap/kernel_heap.h"
+#include "string/string.h"
 #include "elf_loader.h"
-#include "../../fs/file.h"
-#include <stdbool.h>
-#include "../../memory/memory.h"
-#include "../../memory/heap/kernel_heap.h"
-#include "../../string/string.h"
-#include "../../memory/paging/paging.h"
-#include "../../kernel.h"
-#include "../../config.h"
-#include "../../status.h"
-#include "../../fs/file.h"
+#include "fs/file.h"
+#include "kernel.h"
+#include "config.h"
+#include "status.h"
+#include "fs/file.h"
 #include "elf.h"
+#include <stdbool.h>
 
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
 
