@@ -4,6 +4,11 @@
 #include "task.h"
 #include <stdint.h>
 
+#define PROCESS_FILETYPE_ELF 0
+#define PROCESS_FILETYPE_BINARY 1
+
+typedef unsigned char PROCESS_FILETYPE;
+
 /* describes the process */
 struct process
 {
@@ -12,8 +17,16 @@ struct process
     struct task *task;
     /* keeps track of allocations to avoid memory leaks */
     void *allocations[SIMPOS_MAX_PROGRAM_ALLOCATIONS];
-    /* pointer to the process memory */
-    void *ptr;
+
+    PROCESS_FILETYPE filetype;
+
+    union
+    {
+        /* pointer to the process memory */
+        void *ptr;
+        struct elf_file *elf_file;
+    };
+
     /* pointer to the process stack memory */
     void *stack;
     /* size of the data pointer by ptr */

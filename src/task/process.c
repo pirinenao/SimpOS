@@ -8,6 +8,7 @@
 #include "../memory/heap/kernel_heap.h"
 #include "../kernel.h"
 #include "../memory/paging/paging.h"
+#include "loader/formats/elf_loader.h"
 
 struct process *current_process = 0;
 static struct process *processes[SIMPOS_MAX_PROCESSES] = {};
@@ -70,6 +71,7 @@ static int process_load_binary(const char *filename, struct process *process)
         return -EIO;
     }
 
+    process->filetype = PROCESS_FILETYPE_BINARY;
     process->ptr = program_data_ptr;
     process->size = stat.file_size;
 
@@ -77,10 +79,32 @@ static int process_load_binary(const char *filename, struct process *process)
     return res;
 }
 
+static int process_load_elf(const char *filename, struct process *process)
+{
+    int res = 0;
+    struct elf_file *elf_file = 0;
+    res = elf_load(filename, &elf_file);
+    if (res < 0)
+    {
+        return res;
+    }
+
+    process->filetype = PROCESS_FILETYPE_ELF;
+    process->elf_file = elf_file;
+    return res;
+}
+
 static int process_load_data(const char *filename, struct process *process)
 {
     int res = 0;
-    res = process_load_binary(filename, process);
+
+    res = process_load_elf(filename, process);
+
+    /* if the file is not ELF format, load it as binary */
+    if (res == -EINFORMAT)
+    {
+        res = process_load_binary(filename, process);
+    }
     return res;
 }
 
@@ -91,14 +115,37 @@ int process_map_binary(struct process *process)
     return res;
 }
 
+static int process_map_elf(struct process *process)
+{
+    int res = 0;
+    struct elf_file *elf_file = process->elf_file;
+    res = paging_map_to(process->task->page_directory, paging_align_to_lower_page(elf_virtual_base(elf_file)), elf_phys_base(elf_file), paging_align_address(elf_phys_end(elf_file)), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
+    return res;
+}
+
 int process_map_memory(struct process *process)
 {
     int res = 0;
-    res = process_map_binary(process);
+
+    switch (process->filetype)
+    {
+    case PROCESS_FILETYPE_ELF:
+        res = process_map_elf(process);
+        break;
+
+    case PROCESS_FILETYPE_BINARY:
+        res = process_map_binary(process);
+        break;
+
+    default:
+        kernel_panic("process_map_memory: Invalid filetype\n");
+    }
+
     if (res < 0)
     {
         return res;
     }
+
     /* map the stack */
     paging_map_to(process->task->page_directory, (void *)SIMPOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack, paging_align_address(process->stack + SIMPOS_USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
     return res;

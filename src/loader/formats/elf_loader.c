@@ -7,9 +7,11 @@
 #include "../../memory/paging/paging.h"
 #include "../../kernel.h"
 #include "../../config.h"
+#include "../../status.h"
 #include "../../fs/file.h"
+#include "elf.h"
 
-const char *elf_signature[] = {0x7f, 'E', 'L', 'F'};
+const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
 
 /* checks if signature matches to the elf signature */
 static bool elf_valid_signature(void *buffer)
@@ -24,7 +26,7 @@ static bool elf_valid_class(struct elf_header *header)
 }
 
 /* checks if encoded into little-endian */
-static bool elf_valid_encoding(struct elf_ehader *header)
+static bool elf_valid_encoding(struct elf_header *header)
 {
     return header->e_ident[EI_DATA] == ELFDATANONE || header->e_ident[EI_DATA] == ELFDATA2LSB;
 }
@@ -44,7 +46,7 @@ static bool elf_has_program_header(struct elf_header *header)
 /* returns pointer to the elf files physical address */
 void *elf_memory(struct elf_file *file)
 {
-    return file->elf_memory
+    return file->elf_memory;
 }
 
 /* returns the elf header */
@@ -54,9 +56,9 @@ struct elf_header *elf_header(struct elf_file *file)
 }
 
 /* returns the section header */
-struct elf32_shrd *elf_sheader(struct elf_header *header)
+struct elf32_shdr *elf_sheader(struct elf_header *header)
 {
-    return (struct elf32_shr*)(int)header+header->e_shoff);
+    return (struct elf32_shdr *)((int)header + header->e_shoff);
 }
 
 /* check if file has program header and return it */
@@ -71,7 +73,7 @@ struct elf32_phdr *elf_pheader(struct elf_header *header)
 }
 
 /* returns a program header entry based on the given index */
-struct elf32_phdr *elf_has_program_header(struct elf_header *header, int index)
+struct elf32_phdr *elf_program_header(struct elf_header *header, int index)
 {
     return &elf_pheader(header)[index];
 }
@@ -115,7 +117,7 @@ void *elf_phys_end(struct elf_file *file)
 /* validate the elf file */
 int elf_validate_loaded(struct elf_header *header)
 {
-    return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header) && elf_has_program_header(header)) ? SIMPOS_ALL_OK : -EINVARG;
+    return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header) && elf_has_program_header(header)) ? SIMPOS_ALL_OK : -EINFORMAT;
 }
 
 /* calculates base and end addresses for the program header */
@@ -148,6 +150,8 @@ int elf_process_pheader(struct elf_file *elf_file, struct elf32_phdr *phdr)
         res = elf_process_phdr_pt_load(elf_file, phdr);
         break;
     }
+
+    return res;
 }
 
 /* processes all the available program headers */
@@ -166,6 +170,8 @@ int elf_process_pheaders(struct elf_file *elf_file)
             break;
         }
     }
+
+    return res;
 }
 
 /* validates the file and processes the program headers  */
@@ -173,7 +179,7 @@ int elf_process_loaded(struct elf_file *elf_file)
 {
     int res = 0;
     struct elf_header *header = elf_header(elf_file);
-    int res = elf_validate_loaded(header);
+    res = elf_validate_loaded(header);
     if (res < 0)
     {
         return res;
@@ -184,6 +190,8 @@ int elf_process_loaded(struct elf_file *elf_file)
     {
         return res;
     }
+
+    return res;
 }
 
 /* loads and initializes the elf file */
@@ -202,7 +210,7 @@ int elf_load(const char *filename, struct elf_file **file_out)
     struct file_stat stat;
     res = fstat(fd, &stat);
 
-    if (res <= 0)
+    if (res < 0)
     {
         goto out;
     }

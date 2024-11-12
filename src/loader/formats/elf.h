@@ -77,7 +77,7 @@ struct elf32_phdr
     elf32_word p_align;
 } __attribute__((packed));
 
-struct elf32_shrd
+struct elf32_shdr
 {
     elf32_word sh_name;
     elf32_word sh_type;
