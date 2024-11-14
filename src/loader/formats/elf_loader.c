@@ -114,6 +114,12 @@ void *elf_phys_end(struct elf_file *file)
     return file->physical_end_address;
 }
 
+/* returns the physical program header address */
+void *elf_phdr_phys_address(struct elf_file *file, struct elf32_phdr *phdr)
+{
+    return elf_memory(file) + phdr->p_offset;
+}
+
 /* validate the elf file */
 int elf_validate_loaded(struct elf_header *header)
 {

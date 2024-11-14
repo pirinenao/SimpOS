@@ -1,6 +1,7 @@
 #include "memory/heap/kernel_heap.h"
 #include "memory/memory.h"
 #include "string/string.h"
+#include "loader/formats/elf_loader.h"
 #include "idt/idt.h"
 #include "task.h"
 #include "process.h"
@@ -204,6 +205,12 @@ int task_init(struct task *task, struct process *process)
     }
 
     task->registers.ip = SIMPOS_PROGRAM_VIRTUAL_ADDRESS;
+
+    if (process->filetype == PROCESS_FILETYPE_ELF)
+    {
+        task->registers.ip = elf_header(process->elf_file)->e_entry;
+    }
+
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.cs = USER_CODE_SEGMENT;
     task->registers.esp = SIMPOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
