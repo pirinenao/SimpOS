@@ -35,6 +35,41 @@ struct process *process_get(int process_id)
     return processes[process_id];
 }
 
+/* finds free slot from the process->allocations array */
+static int process_find_free_allocation_index(struct process *process)
+{
+    int res = -ENOMEM;
+    for (int i = 0; i < SIMPOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == 0)
+        {
+            res = 1;
+            break;
+        }
+    }
+    return res;
+}
+
+/* abstracted memory allocation function for stdlib to avoid memory leaks */
+void *process_malloc(struct process *process, size_t size)
+{
+    void *ptr = kzalloc(size);
+    if (!ptr)
+    {
+        return 0;
+    }
+
+    int index = process_find_free_allocation_index(process);
+    if (index < 0)
+    {
+        return 0;
+    }
+
+    process->allocations[index] = ptr;
+
+    return ptr;
+}
+
 /* switch current process to the given process */
 int process_switch(struct process *process)
 {
