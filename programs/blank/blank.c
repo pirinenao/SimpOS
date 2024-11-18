@@ -6,7 +6,7 @@ int main(int argc, char **argv)
     print("Hello from the user program\n");
 
     void *ptr = malloc(512);
-
+    free(ptr);
     if (ptr)
     {
     }

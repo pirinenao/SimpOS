@@ -50,6 +50,46 @@ static int process_find_free_allocation_index(struct process *process)
     return res;
 }
 
+/* check if the pointer can be found from the process allocations list */
+static bool process_is_process_pointer(struct process *process, void *ptr)
+{
+    for (int i = 0; i < SIMPOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == ptr)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/* removes the allocation from the process allocations list */
+static void remove_process_allocation(struct process *process, void *ptr)
+{
+
+    for (int i = 0; i < SIMPOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == ptr)
+        {
+            process->allocations[i] = 0x00;
+        }
+    }
+}
+
+/* free process allocated memory */
+void process_free(struct process *process, void *ptr)
+{
+    /* return if the pointer doesn't belong to this process */
+    if (!process_is_process_pointer(process, ptr))
+    {
+        return;
+    }
+
+    remove_process_allocation(process, ptr);
+    kfree(ptr);
+}
+
 /* abstracted memory allocation function for stdlib to avoid memory leaks */
 void *process_malloc(struct process *process, size_t size)
 {
