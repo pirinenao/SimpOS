@@ -4,9 +4,9 @@
 
 int main(int argc, char **argv)
 {
-    print(itoa(1337));
+    int num = 1337;
 
-    putchar('X');
+    printf("Hello %d", num);
 
     void *ptr = malloc(512);
     free(ptr);
