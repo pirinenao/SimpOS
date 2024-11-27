@@ -6,6 +6,8 @@ global print:function
 global getkey:function
 global simpos_malloc:function
 global simpos_free:function
+global simpos_putchar:function
+
 
 ; void print(const char* message)
 print:
@@ -37,6 +39,17 @@ simpos_malloc:
     add esp, 4          ; restore the state of the stack
     pop ebp             ; preserve callers stack frame
     ret                 ; return    
+
+;void simpos_putchar(char c)
+simpos_putchar:
+    push ebp            ; preserve callers stack frame
+    mov ebp, esp        ; establish a new stack frame
+    mov eax, 3          ; index of putchar command for interrupt 0x80   
+    push dword[ebp+8]   ; retrieve the function argmument
+    int 0x80            ; call the interrupt
+    add esp, 4          ; restore the state of the stack
+    pop ebp             ; preserve callers stack frame
+    ret    
 
 ; void simpos_free(void* ptr)
 simpos_free:

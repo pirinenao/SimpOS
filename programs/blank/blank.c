@@ -1,9 +1,12 @@
 #include "simpos.h"
 #include "stdlib.h"
+#include "stdio.h"
 
 int main(int argc, char **argv)
 {
     print(itoa(1337));
+
+    putchar('X');
 
     void *ptr = malloc(512);
     free(ptr);
