@@ -3,7 +3,7 @@
 section .asm
 
 global print:function
-global getkey:function
+global simpos_getkey:function
 global simpos_malloc:function
 global simpos_free:function
 global simpos_putchar:function
@@ -20,8 +20,8 @@ print:
     pop ebp             ; preserve callers stack frame
     ret                 ; return
 
-; int getkey();
-getkey:
+; int simpos_getkey();
+simpos_getkey:
     push ebp            ; preserve callers stack frame
     mov ebp, esp        ; establish a new stack frame
     mov eax, 2          ; index of getkey command for interrupt 0x80   
