@@ -10,6 +10,12 @@
 
 typedef unsigned char PROCESS_FILETYPE;
 
+struct process_allocation
+{
+    void *ptr;
+    size_t size;
+};
+
 /* describes the process */
 struct process
 {
@@ -17,7 +23,7 @@ struct process
     char filename[SIMPOS_MAX_PATH];
     struct task *task;
     /* keeps track of allocations to avoid memory leaks */
-    void *allocations[SIMPOS_MAX_PROGRAM_ALLOCATIONS];
+    struct process_allocation allocations[SIMPOS_MAX_PROGRAM_ALLOCATIONS];
 
     PROCESS_FILETYPE filetype;
 

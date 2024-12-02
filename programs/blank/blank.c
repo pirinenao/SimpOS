@@ -9,6 +9,10 @@ int main(int argc, char **argv)
     strcpy(ptr, "hello world");
 
     print(ptr);
+    free(ptr);
+    /* testing if memory can be accessed after free() function */
+    ptr[0] = 'B';
+    print("abc");
 
     while (1)
     {
