@@ -5,18 +5,10 @@
 
 int main(int argc, char **argv)
 {
-    int num = 1337;
+    char *ptr = malloc(20);
+    strcpy(ptr, "hello world");
 
-    printf("Hello %d", num);
-
-    char words[] = "Hello this is a strtok test";
-    const char *token = strtok(words, " ");
-
-    while (token)
-    {
-        printf("%s\n", token);
-        token = strtok(NULL, " ");
-    }
+    print(ptr);
 
     while (1)
     {
