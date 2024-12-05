@@ -5,14 +5,11 @@
 
 int main(int argc, char **argv)
 {
-    char *ptr = malloc(20);
-    strcpy(ptr, "hello world");
+    char str[] = "hello world";
+    struct command_argument* root_command = simpos_parse_command(str, sizeof(str));
 
-    print(ptr);
-    free(ptr);
-    /* testing if memory can be accessed after free() function */
-    ptr[0] = 'B';
-    print("abc");
+    printf("%s\n", root_command->argument);
+    printf("%s\n", root_command->next);
 
     while (1)
     {
