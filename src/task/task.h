@@ -53,5 +53,7 @@ int task_page();
 int task_page_task(struct task *task);
 int copy_string_from_task(struct task *task, void *virtual, void *phys, int max);
 void *task_get_stack_item(struct task *task, int index);
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address);
+
 
 #endif

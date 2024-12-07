@@ -5,11 +5,10 @@
 
 int main(int argc, char **argv)
 {
-    char str[] = "hello world";
-    struct command_argument* root_command = simpos_parse_command(str, sizeof(str));
+    struct process_arguments arguments;
+    simpos_process_get_arguments(&arguments);
 
-    printf("%s\n", root_command->argument);
-    printf("%s\n", root_command->next);
+    printf("%d %s \n", arguments.argc, arguments.argv[0]);
 
     while (1)
     {

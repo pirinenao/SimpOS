@@ -7,6 +7,7 @@
 #include "process.h"
 #include "status.h"
 #include "kernel.h"
+#include "memory/paging/paging.h"
 
 int task_init(struct task *task, struct process *process);
 
@@ -237,4 +238,9 @@ void *task_get_stack_item(struct task *task, int index)
     /* back to the kernel page */
     kernel_page();
     return result;
+}
+
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address)
+{
+    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
 }
