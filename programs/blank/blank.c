@@ -5,7 +5,12 @@
 
 int main(int argc, char **argv)
 {
-    print(argv[0]);
+    /* prints out the arguments as a test */
+    for(int i = 0; i<argc; i++)
+    {
+        printf("%s \n", argv[i]);
+    }
+
     while (1)
     {
     }

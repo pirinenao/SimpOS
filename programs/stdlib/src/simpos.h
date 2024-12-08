@@ -25,7 +25,8 @@ void simpos_terminal_readline(char *out, int max, bool output_while_typing);
 void simpos_process_load_start(const char *filename);
 struct command_argument* simpos_parse_command(const char* command, int max);
 void simpos_process_get_arguments(struct process_arguments* arguments);
-
+int simpos_system(struct command_argument* arguments);
+int simpos_system_run(const char* command);
 
 
 #endif

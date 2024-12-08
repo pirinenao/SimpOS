@@ -5,7 +5,7 @@
 struct command_argument* simpos_parse_command(const char* command, int max)
 {
     struct command_argument* root_command = 0;
-    char scommand[1024];
+    char scommand[1025];
 
     if(max >= (int) sizeof(scommand))
     {
@@ -101,4 +101,18 @@ void simpos_terminal_readline(char *out, int max, bool output_while_typing)
     }
     // add null
     out[i] = 0x00;
+}
+
+int simpos_system_run(const char* command)
+{
+    char buf[1024];
+    strncpy(buf, command, sizeof(buf));
+    struct command_argument* root_command_argument = simpos_parse_command(buf, sizeof(buf));
+
+    if(!root_command_argument)
+    {
+        return -1;
+    }
+
+    return simpos_system(root_command_argument);
 }

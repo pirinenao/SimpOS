@@ -100,18 +100,12 @@ void kernel_main()
     keyboard_init();
 
     struct process *process = 0;
-    int res = process_load_switch("0:/blank.elf", &process);
+    int res = process_load_switch("0:/shell.elf", &process);
 
     if (res != SIMPOS_ALL_OK)
     {
-        kernel_panic("Failed to load blank.elf\n");
+        kernel_panic("Failed to load shell.elf\n");
     }
-
-    struct command_argument argument;
-    strcpy(argument.argument, "testing");
-    argument.next = 0x00;
-
-    process_inject_arguments(process, &argument);
     
     task_run_first_ever_task();
 
