@@ -456,3 +456,93 @@ void process_get_arguments(struct process* process, int* argc, char*** argv)
     *argc = process->arguments.argc;
     *argv = process->arguments.argv;
 }
+
+/* used for switching to other process after terminating one */
+void process_switch_to_any()
+{
+    for(int i = 0; i<SIMPOS_MAX_PROCESSES; i++)
+    {
+        if(processes[i])
+        {
+            process_switch(processes[i]);
+            return;
+        }
+    }
+
+    kernel_panic("No processes to switch to\n");
+}
+
+/* removes current process from the processes list */
+static void process_unlink(struct process* process)
+{
+    processes[process->id] = 0x00;
+
+    if(current_process == process)
+    {
+        process_switch_to_any();
+    }
+}
+
+static int process_terminate_allocations(struct process* process)
+{
+    for(int i = 0; i< SIMPOS_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        process_free(process, process->allocations[i].ptr);
+    }
+
+    return 0;
+}
+
+int process_free_binary_data(struct process* process)
+{
+    kfree(process->ptr);
+    return 0;
+}
+
+int process_free_elf_data(struct process* process)
+{
+    elf_close(process->elf_file);
+    return 0;
+}
+
+int process_free_program_data(struct process* process)
+{
+    int res = 0;
+    switch(process->filetype)
+    {
+        case PROCESS_FILETYPE_BINARY:
+            res = process_free_binary_data(process);
+        break;
+
+        case PROCESS_FILETYPE_ELF:
+            res = process_free_elf_data(process);
+        break;
+
+        default:
+            res = -EINVARG;
+    }
+    return res;
+}
+
+int process_terminate(struct process* process)
+{
+    int res = 0;
+
+    res = process_terminate_allocations(process);
+    if(res < 0)
+    {
+        return res;
+    }
+
+    res = process_free_program_data(process);
+    if(res < 0)
+    {
+        return res;
+    }
+
+    kfree(process->stack);
+    task_free(process->task);
+    process_unlink(process);
+
+    return 0;
+}
