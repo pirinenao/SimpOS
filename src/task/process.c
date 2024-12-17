@@ -382,7 +382,7 @@ int process_load_for_slot(const char *filename, struct process **process, int pr
     *process = _process;
 
     /* add the process to the array */
-    process[process_slot] = _process;
+    processes[process_slot] = _process;
 out:
     if (ISERR(res))
     {
@@ -544,5 +544,5 @@ int process_terminate(struct process* process)
     task_free(process->task);
     process_unlink(process);
 
-    return 0;
+    return res;
 }
