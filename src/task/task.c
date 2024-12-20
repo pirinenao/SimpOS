@@ -63,6 +63,18 @@ int task_free(struct task *task)
     return 0;
 }
 
+void task_next()
+{
+   struct task* next_task = task_get_next();
+   if(!next_task)
+   {
+       kernel_panic("No more tasks!\n");
+   }
+
+   task_switch(next_task);
+   task_return(&next_task->registers);
+}
+
 struct task *task_new(struct process *process)
 {
     int res = 0;

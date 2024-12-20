@@ -6,6 +6,7 @@
 #include "status.h"
 #include "idt.h"
 #include "config.h"
+#include "task/process.h"
 
 /* defined structures */
 struct idt_desc idt_descriptors[SIMPOS_TOTAL_INTERRUPTS];
@@ -50,6 +51,12 @@ void idt_set(int interrupt_no, void *address)
     desc->offset_2 = (uint32_t)address >> 16; // shift the upper 16 bits into the lower 16 bits
 }
 
+void idt_handle_exception()
+{
+    process_terminate(task_current()->process);
+    task_next();
+}
+
 /* initializes IDT and IDTR  */
 void idt_init()
 {
@@ -66,8 +73,14 @@ void idt_init()
     /* create ISR entries */
     idt_set(0x80, isr80h_wrapper);
 
+    for(int i = 0; i < 0x20; i++)
+    {
+        idt_register_interrupt_callback(i, idt_handle_exception);
+    }
+
     /* loads the IDT into IDTR */
     idt_load(&idtr_descriptor);
+
 }
 
 /* registers interrupts and their corresponding handles */

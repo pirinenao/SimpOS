@@ -5,15 +5,8 @@
 
 int main(int argc, char **argv)
 {
-    /* prints out the arguments as a test */
-    for(int i = 0; i<argc; i++)
-    {
-        printf("%s \n", argv[i]);
-    }
-
-    while (1)
-    {
-    }
+    /* testing */
+    print("inside blank.elf\n");
 
     return 0;
 }

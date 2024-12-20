@@ -10,7 +10,7 @@ global simpos_putchar:function
 global simpos_process_load_start:function
 global simpos_system:function
 global simpos_process_get_arguments:function
-
+global simpos_exit:function
 
 
 ; void print(const char* message)
@@ -98,3 +98,13 @@ simpos_process_get_arguments:
     add esp, 4          ; restore the state of the stack
     pop ebp             ; preserve callers stack frame
     ret                 ; return  
+
+; void simpos_exit()
+simpos_exit:
+    push ebp            ; preserve callers stack frame
+    mov ebp, esp        ; establish a new stack frame
+    mov eax, 9          ; index of exit command for interrupt 0x80   
+    int 0x80            ; call the interrupt
+    pop ebp             ; preserve callers stack frame
+    ret                 ; return  
+
