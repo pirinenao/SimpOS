@@ -43,6 +43,16 @@ static int keyboard_get_tail_index(struct process *process)
     return process->keyboard.tail % sizeof(process->keyboard.buffer);
 }
 
+void keyboard_set_capslock(struct keyboard* keyboard, KEYBOARD_CAPS_LOCK_STATE state)
+{
+    keyboard->capslock_state = state;
+}
+
+KEYBOARD_CAPS_LOCK_STATE keyboard_get_capslock_state(struct keyboard* keyboard)
+{
+    return keyboard->capslock_state;
+}
+
 /* backspace functionality */
 void keyboard_backspace(struct process *process)
 {

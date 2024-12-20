@@ -12,6 +12,8 @@
 #include "keyboard.h"
 #include "kernel.h"
 
+#define CLASSIC_KEYBOARD_CAPSLOCK 0x3A
+
 int classic_keyboard_init();
 void classic_keyboard_handle_interrupt();
 
@@ -40,6 +42,7 @@ int classic_keyboard_init()
 {
     idt_register_interrupt_callback(ISR_KEYBOARD_INTERRUPT, classic_keyboard_handle_interrupt);
     outb(PS2_COMMAND_PORT, PS2_COMMAND_ENABLE_FIRST_PORT);
+    keyboard_set_capslock(&classic_keyboard, KEYBOARD_CAPS_LOCK_OFF);
     return 0;
 }
 
@@ -53,6 +56,15 @@ uint8_t classic_keyboard_scancode_to_char(uint8_t scancode)
     }
 
     char c = keyboard_scan_set_one[scancode];
+
+    if(keyboard_get_capslock_state(&classic_keyboard) == KEYBOARD_CAPS_LOCK_OFF)
+    {
+        if(c>= 'A' && c <= 'Z')
+        {
+            c += 32;
+        }
+    }
+
     return c;
 }
 
@@ -67,6 +79,20 @@ void classic_keyboard_handle_interrupt()
     if (scancode & CLASSIC_KEYBOARD_KEY_RELEASE)
     {
         return;
+    }
+
+    if(scancode == CLASSIC_KEYBOARD_CAPSLOCK)
+    {
+        KEYBOARD_CAPS_LOCK_STATE old_state = keyboard_get_capslock_state(&classic_keyboard);
+        if(old_state == KEYBOARD_CAPS_LOCK_ON)
+        {
+            keyboard_set_capslock(&classic_keyboard, KEYBOARD_CAPS_LOCK_OFF);
+        }else
+        {
+            keyboard_set_capslock(&classic_keyboard, KEYBOARD_CAPS_LOCK_ON);
+        }
+        
+        
     }
 
     uint8_t c = classic_keyboard_scancode_to_char(scancode);
