@@ -118,11 +118,13 @@ int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_privat
 
     if (diskstreamer_seek(stream, fat16_sector_to_absolute(disk, root_dir_sector_pos)) != SIMPOS_ALL_OK)
     {
+        kfree(dir);
         return -EIO;
     }
 
     if (diskstreamer_read(stream, dir, root_dir_size) != SIMPOS_ALL_OK)
     {
+        kfree(dir);
         return -EIO;
     }
 
@@ -463,6 +465,7 @@ struct fat_item *fat16_new_fat_item_for_directory_item(struct disk *disk, struct
     {
         f_item->directory = fat16_load_fat_directory(disk, item);
         f_item->type = FAT_ITEM_TYPE_DIRECTORY;
+        return f_item;
     }
 
     f_item->type = FAT_ITEM_TYPE_FILE;
@@ -529,6 +532,7 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode)
 
     if (!descriptor)
     {
+        kfree(descriptor);
         return ERROR(-ENOMEM);
     }
 
@@ -537,6 +541,7 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode)
 
     if (!descriptor->item)
     {
+        kfree(descriptor);
         return ERROR(-EIO);
     }
 
