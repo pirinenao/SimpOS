@@ -131,7 +131,7 @@ int fat16_root_directory_setup(struct disk *disk, struct fat_private *fat_privat
     directory->item = dir;
     directory->total = total_items;
     directory->first_sector_pos = root_dir_sector_pos;
-    directory->last_sector_pos = root_dir_sector_pos + (root_dir_size / disk->sector_size);
+    directory->last_sector_pos = root_dir_sector_pos + total_sectors;
 
     return 0;
 }
@@ -246,7 +246,7 @@ struct fat_directory_item *fat16_clone_directory_item(struct fat_directory_item 
 /* returns the address to first cluster */
 static uint32_t fat16_get_first_cluster(struct fat_directory_item *item)
 {
-    return (item->high_16_bits_first_cluster | item->low_16_bits_first_cluster);
+    return (item->high_16_bits_first_cluster << 16) | item->low_16_bits_first_cluster;
 }
 
 /* takes a cluster number and returns the corresponding sector */
@@ -272,7 +272,7 @@ static int fat16_get_fat_entry(struct disk *disk, int cluster)
     }
 
     uint32_t fat_table_position = fat16_get_first_fat_sector(private) * disk->sector_size;
-    res = diskstreamer_seek(stream, fat_table_position * (cluster * SIMPOS_FAT16_FAT_ENTRY_SIZE));
+    res = diskstreamer_seek(stream, fat_table_position + (cluster * SIMPOS_FAT16_FAT_ENTRY_SIZE));
     if (res < 0)
     {
         return res;
@@ -302,7 +302,7 @@ static int fat16_get_cluster_for_offset(struct disk *disk, int starting_cluster,
     {
         int entry = fat16_get_fat_entry(disk, cluster_to_use);
         /* if at the last entry */
-        if (entry == 0xFF8 || entry == 0xFFF)
+        if (entry == 0xFFF8 || entry == 0xFFFF)
         {
             return -EIO;
         }
@@ -612,7 +612,8 @@ int fat16_read(struct disk *disk, void *descriptor, uint32_t size, uint32_t nmem
         out += size;
         offset += size;
     }
-
+    
+    fat_desc->pos = offset;
     res = nmemb;
 
     return res;

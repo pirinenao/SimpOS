@@ -35,6 +35,10 @@ static int pathparser_get_drive_number(const char **path)
 static struct path_root *pathparser_create_root(int drive_number)
 {
     struct path_root *path_r = kzalloc(sizeof(struct path_root));
+    if(!path_r)
+    {
+        return NULL;
+    }
     path_r->drive_no = drive_number;
     path_r->first = 0;
     return path_r;
@@ -44,6 +48,10 @@ static struct path_root *pathparser_create_root(int drive_number)
 static const char *pathparser_get_path_part(const char **path)
 {
     char *result_path_part = kzalloc(SIMPOS_MAX_PATH);
+    if(!result_path_part)
+    {
+        return NULL;
+    }
     int i = 0;
     while (**path != '/' && **path != 0x00)
     {
@@ -83,6 +91,11 @@ struct path_part *pathparser_parse_path_part(struct path_part *last_part, const 
 
     /* create path part, and allocate memory */
     struct path_part *part = kzalloc(sizeof(struct path_part));
+    if(!part)
+    {
+        kfree((void*)path_part_str);
+        return NULL;
+    }
     part->part = path_part_str;
     part->next = 0x00;
 
@@ -122,38 +135,59 @@ struct path_root *pathparser_parse(const char *path, const char *current_directo
     int res = 0;
     const char *tmp_path = path;
     struct path_root *path_root = NULL;
+    struct path_part *first_part = NULL;
+    struct path_part *part = NULL;
 
     /* extracts the drive number, and removes it from the tmp_path */
     res = pathparser_get_drive_number(&tmp_path);
     if (res < 0)
     {
-        return path_root;
+        res = -1;
+        goto out;
     }
 
     /* set ups root for the path */
     path_root = pathparser_create_root(res);
     if (!path_root)
     {
-        return path_root;
+        res = -1;
+        goto out;
     }
 
     /* parses the first part of the path */
-    struct path_part *first_part = pathparser_parse_path_part(NULL, &tmp_path);
+    first_part = pathparser_parse_path_part(NULL, &tmp_path);
     if (!first_part)
     {
-        return path_root;
+        res = -1;
+        goto out;
     }
     path_root->first = first_part;
 
     /* parses the next part of path. has to be parsed outside
      * the loop because we must send first part as an argument
      */
-    struct path_part *part = pathparser_parse_path_part(first_part, &tmp_path);
+    part = pathparser_parse_path_part(first_part, &tmp_path);
 
     /* parse rest of the path */
     while (part)
     {
         part = pathparser_parse_path_part(part, &tmp_path);
+    }
+
+out:
+    if(res < 0)
+    {
+        if(path_root)
+        {
+            kfree(path_root);
+            path_root = NULL; 
+        }
+
+        if(first_part)
+        {
+            kfree(first_part);
+        }
+
     }
 
     return path_root;

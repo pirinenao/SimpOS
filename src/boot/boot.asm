@@ -40,8 +40,10 @@ step2:
     cli                 ; clear interrupts
     ; initializing segment registers
     mov ax, 0x00
-    mov ds, ax
     mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ds, ax
     mov ss, ax
     mov sp, 0x7c00
     sti                 ; enable interrupts
@@ -89,9 +91,23 @@ gdt_descriptor:
 ; loading kernel to the memory
 [BITS 32]
 load32:
+    mov ax, DATA_SEG
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ds, ax
+    mov ss, ax
+    
+    ; enabling A20 line for full memory access
+    ; https://wiki.osdev.org/A20_Line
+    in al, 0x92
+    or al, 2
+    out 0x92, al
+    
     mov eax, 1              ; starting sector
     mov ecx, 100            ; total number of sectors we want to load
     mov edi, 0x0100000      ; the address we want to load the sectors into
+
     call ata_lba_read
     jmp CODE_SEG:0x0100000
 

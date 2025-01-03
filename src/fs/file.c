@@ -142,8 +142,12 @@ FILE_MODE file_get_mode_by_string(const char *str)
 int fopen(const char *filename, const char *mode_str)
 {
     int res = 0;
-
+    struct disk *disk = NULL;
+    FILE_MODE mode = FILE_MODE_INVALID;
+    void *descriptor_private_data = NULL;
+    struct file_descriptor *desc = 0;
     struct path_root *root_path = pathparser_parse(filename, NULL);
+
     if (!root_path)
     {
         res = -EINVARG;
@@ -157,7 +161,7 @@ int fopen(const char *filename, const char *mode_str)
     }
 
     // ensure the disk we are reading from exists
-    struct disk *disk = disk_get(root_path->drive_no);
+    disk = disk_get(root_path->drive_no);
     if (!disk)
     {
         res = -EIO;
@@ -170,7 +174,7 @@ int fopen(const char *filename, const char *mode_str)
         goto out;
     }
 
-    FILE_MODE mode = file_get_mode_by_string(mode_str);
+    mode = file_get_mode_by_string(mode_str);
     if (mode == FILE_MODE_INVALID)
     {
         res = -EINVARG;
@@ -178,14 +182,13 @@ int fopen(const char *filename, const char *mode_str)
     }
 
     /* calls the lower filesystems open function */
-    void *descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
+    descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
     if (ISERR(descriptor_private_data))
     {
         res = ERROR_I(descriptor_private_data);
         goto out;
     }
 
-    struct file_descriptor *desc = 0;
     res = new_file_descriptor(&desc);
     if (res < 0)
     {
@@ -199,9 +202,32 @@ int fopen(const char *filename, const char *mode_str)
     res = desc->index;
 
 out:
-    // fopen shouldnt return negative values
+
+    // if error
     if (res < 0)
+    {
+        if(root_path)
+        {
+            pathparser_free(root_path);
+            root_path = NULL;
+        }
+
+        if(disk && descriptor_private_data)
+        {
+            disk->filesystem->close(descriptor_private_data);
+            descriptor_private_data = NULL;
+        }
+
+        if(desc)
+        {
+            file_free_descriptor(desc);
+            desc = NULL;
+        }
+
+        // fopen shouldnt return negative values
         res = 0;
+    }
+
 
     return res;
 }

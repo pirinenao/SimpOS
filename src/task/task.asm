@@ -25,10 +25,12 @@ task_return:
     mov ebx, [ebp+4]    ; access the struct
     push dword [ebx+44] ; push the data/stack selector
     push dword [ebx+40] ; push the stack pointer
-    pushf               ; push the flags
-    pop eax
+
+    ; push the flags
+    mov eax, [ebx+36]
     or eax, 0x200
     push eax
+
     push dword [ebx+32] ; push the code segment
     push dword [ebx+28] ; push the ip
     

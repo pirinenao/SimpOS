@@ -4,7 +4,7 @@
 
 struct interrupt_frame;
 typedef void *(*ISR80_COMMAND)(struct interrupt_frame *frame);
-typedef void (*INTERRUPT_CALLBACK_FUNCTION)();
+typedef void (*INTERRUPT_CALLBACK_FUNCTION)(struct interrupt_frame* frame);
 
 /* structure for interrupt description table entries */
 struct idt_desc

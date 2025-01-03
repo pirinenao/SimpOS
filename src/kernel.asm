@@ -22,17 +22,13 @@ _start:
     mov ebp, 0x00200000
     mov esp, ebp
 
-    ; enabling A20 line for full memory access
-    ; https://wiki.osdev.org/A20_Line
-    in al, 0x92
-    or al, 2
-    out 0x92, al
-
     ; remap master PIC (programmable interupt controller)
     mov al, 00010001b   ; init mode
     out 0x20, al        ; send to command port
     mov al, 0x20        ; master ISR starting address
     out 0x21, al        ; send to data port
+    mov al, 0x04
+    out 0x21, al        ; map the slave 
     mov al, 00000001b   ; x86 mode
     out 0x21, al        ; send to data port
 

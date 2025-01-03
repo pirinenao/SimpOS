@@ -123,7 +123,7 @@ void *elf_phdr_phys_address(struct elf_file *file, struct elf32_phdr *phdr)
 /* validate the elf file */
 int elf_validate_loaded(struct elf_header *header)
 {
-    return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header) && elf_has_program_header(header)) ? SIMPOS_ALL_OK : -EINFORMAT;
+    return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header) && elf_is_executable(header) && elf_has_program_header(header)) ? SIMPOS_ALL_OK : -EINFORMAT;
 }
 
 /* calculates base and end addresses for the program header */
@@ -200,10 +200,28 @@ int elf_process_loaded(struct elf_file *elf_file)
     return res;
 }
 
+/* free the elf file */
+void elf_file_free(struct elf_file* elf_file)
+{
+    if(elf_file->elf_memory)
+    {
+        kfree(elf_file->elf_memory);
+    }
+
+    kfree(elf_file);
+
+}
+
+/* allocate memory for elf file */
+struct elf_file* elf_file_new()
+{
+    return (struct elf_file*) kzalloc(sizeof(struct elf_file));
+}
+
 /* loads and initializes the elf file */
 int elf_load(const char *filename, struct elf_file **file_out)
 {
-    struct elf_file *elf_file = kzalloc(sizeof(struct elf_file));
+    struct elf_file *elf_file = elf_file_new();
     int fd = 0;
     int res = fopen(filename, "r");
     if (res <= 0)
@@ -242,6 +260,10 @@ int elf_load(const char *filename, struct elf_file **file_out)
     /* point to the memory address of our elf file */
     *file_out = elf_file;
 out:
+    if(res < 0)
+    {
+        elf_file_free(elf_file);
+    }
     fclose(fd);
     return res;
 }

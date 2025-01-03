@@ -59,7 +59,7 @@ void kernel_main()
     gdt_structured_to_gdt(gdt_real, gdt_structured, SIMPOS_TOTAL_GDT_SEGMENTS);
 
     /* loads the gdt to gdtr */
-    gdt_load(gdt_real, sizeof(gdt_real));
+    gdt_load(gdt_real, sizeof(gdt_real)-1);
 
     /*initialize heap*/
     kernel_heap_init();
