@@ -17,7 +17,7 @@ restore_general_purpose_registers:
     mov ecx, [ebx+20]
     mov eax, [ebx+24]
     mov ebx, [ebx+12]
-    pop ebp             ; restore previous stack frame
+    add esp, 4          ; restore previous stack frame
     ret                 ; return
 
 task_return:

@@ -171,17 +171,21 @@ static int process_load_binary(const char *filename, struct process *process)
     res = fstat(fd, &stat);
     if (res != SIMPOS_ALL_OK)
     {
+        fclose(fd);
         return res;
     }
 
     void *program_data_ptr = kzalloc(stat.file_size);
     if (!program_data_ptr)
     {
+        fclose(fd);
         return -ENOMEM;
     }
 
     if (fread(program_data_ptr, stat.file_size, 1, fd) != 1)
     {
+        fclose(fd);
+        kfree(program_data_ptr);
         return -EIO;
     }
 
